@@ -13,7 +13,7 @@ var p4 = 'p4';
 var PRODUCT_5 = `p5`;
 var cartDisp;
 function main() {
-  var root;
+  const rootElement = document.getElementById('app');
   var header;
   var gridContainer;
   var leftColumn;
@@ -73,7 +73,7 @@ function main() {
       suggestSale: false,
     },
   ];
-  var root = document.getElementById('app');
+
   header = document.createElement('div');
   header.className = 'mb-8';
   header.innerHTML = `
@@ -226,10 +226,10 @@ function main() {
   gridContainer.appendChild(leftColumn);
   gridContainer.appendChild(rightColumn);
   manualOverlay.appendChild(manualColumn);
-  root.appendChild(header);
-  root.appendChild(gridContainer);
-  root.appendChild(manualToggle);
-  root.appendChild(manualOverlay);
+  rootElement.appendChild(header);
+  rootElement.appendChild(gridContainer);
+  rootElement.appendChild(manualToggle);
+  rootElement.appendChild(manualOverlay);
   var initStock = 0;
   for (var i = 0; i < prodList.length; i++) {
     initStock += prodList[i].q;
