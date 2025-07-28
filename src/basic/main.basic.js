@@ -1,5 +1,5 @@
 var prodList;
-var bonusPts = 0;
+
 var stockInfo;
 var itemCnt;
 var lastSel;
@@ -573,21 +573,21 @@ function handleCalculateCartStuff() {
   }
   stockInfo.textContent = stockMsg;
   handleStockInfoUpdate();
-  doRenderBonusPoints();
+  renderBonusPoints(totalAmt, itemCnt, prodList, cartDisp);
 }
-var doRenderBonusPoints = function () {
-  var basePoints;
-  var finalPoints;
-  var pointsDetail;
-  var hasKeyboard;
-  var hasMouse;
-  var hasMonitorArm;
-  var nodes;
-  if (cartDisp.children.length === 0) {
+const renderBonusPoints = function (currentTotalAmt, currentItemCnt, currentProdList, currentCartDisp) {
+  let basePoints;
+  let finalPoints;
+  let pointsDetail;
+  let hasKeyboard;
+  let hasMouse;
+  let hasMonitorArm;
+  let nodes;
+  if (currentCartDisp.children.length === 0) {
     document.getElementById('loyalty-points').style.display = 'none';
     return;
   }
-  basePoints = Math.floor(totalAmt / 1000);
+  basePoints = Math.floor(currentTotalAmt / 1000);
   finalPoints = 0;
   pointsDetail = [];
   if (basePoints > 0) {
@@ -603,12 +603,12 @@ var doRenderBonusPoints = function () {
   hasKeyboard = false;
   hasMouse = false;
   hasMonitorArm = false;
-  nodes = cartDisp.children;
+  nodes = currentCartDisp.children;
   for (const node of nodes) {
-    var product = null;
-    for (var pIdx = 0; pIdx < prodList.length; pIdx++) {
-      if (prodList[pIdx].id === node.id) {
-        product = prodList[pIdx];
+    let product = null;
+    for (let pIdx = 0; pIdx < currentProdList.length; pIdx++) {
+      if (currentProdList[pIdx].id === node.id) {
+        product = currentProdList[pIdx];
         break;
       }
     }
@@ -629,27 +629,27 @@ var doRenderBonusPoints = function () {
     finalPoints = finalPoints + 100;
     pointsDetail.push('풀세트 구매 +100p');
   }
-  if (itemCnt >= 30) {
+  if (currentItemCnt >= 30) {
     finalPoints = finalPoints + 100;
     pointsDetail.push('대량구매(30개+) +100p');
   } else {
-    if (itemCnt >= 20) {
+    if (currentItemCnt >= 20) {
       finalPoints = finalPoints + 50;
       pointsDetail.push('대량구매(20개+) +50p');
     } else {
-      if (itemCnt >= 10) {
+      if (currentItemCnt >= 10) {
         finalPoints = finalPoints + 20;
         pointsDetail.push('대량구매(10개+) +20p');
       }
     }
   }
-  bonusPts = finalPoints;
-  var ptsTag = document.getElementById('loyalty-points');
+  let loyaltyPoints = finalPoints;
+  let ptsTag = document.getElementById('loyalty-points');
   if (ptsTag) {
-    if (bonusPts > 0) {
+    if (loyaltyPoints > 0) {
       ptsTag.innerHTML =
         '<div>적립 포인트: <span class="font-bold">' +
-        bonusPts +
+        loyaltyPoints +
         'p</span></div>' +
         '<div class="text-2xs opacity-70 mt-1">' +
         pointsDetail.join(', ') +
