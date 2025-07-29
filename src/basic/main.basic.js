@@ -420,6 +420,60 @@ function updateTuesdaySpecialDisplay() {
   }
 }
 
+// Business logic functions
+function calculateCartItems(cartItems) {
+  const items = Array.from(cartItems).map((itemElement) => {
+    const product = findProductById(itemElement.id);
+    const quantity = parseInt(
+      itemElement.querySelector('.quantity-number').textContent
+    );
+    return {
+      product,
+      quantity,
+      itemTotal: product.val * quantity,
+    };
+  });
+
+  return {
+    items,
+    subtotal: items.reduce((sum, item) => sum + item.itemTotal, 0),
+    totalQuantity: items.reduce((sum, item) => sum + item.quantity, 0),
+  };
+}
+
+function calculateDiscounts(cartData) {
+  const { items, subtotal, totalQuantity } = cartData;
+  const itemDiscounts = [];
+  let totalAmount = subtotal;
+
+  // 개별 상품 할인 계산
+  items.forEach(({ product, quantity, itemTotal }) => {
+    const discount = calculateIndividualDiscount(product.id, quantity);
+    if (discount > 0) {
+      itemDiscounts.push({ name: product.name, discount });
+      totalAmount -= itemTotal * (discount / 100);
+    }
+  });
+
+  // 전체 수량 할인
+  const bulkDiscount = calculateBulkDiscount(totalQuantity);
+  if (bulkDiscount > 0) {
+    totalAmount = subtotal * (1 - bulkDiscount / 100);
+  }
+
+  // 화요일 할인
+  const tuesdayDiscount = calculateTuesdayDiscount(totalAmount);
+  if (tuesdayDiscount > 0) {
+    totalAmount *= 1 - tuesdayDiscount / 100;
+  }
+
+  return {
+    totalAmount,
+    itemDiscounts,
+    discountRate: subtotal > 0 ? (subtotal - totalAmount) / subtotal : 0,
+  };
+}
+
 function main() {
   const rootElement = document.getElementById('app');
   let header;
@@ -706,72 +760,40 @@ function main() {
 }
 var sum;
 function handleCalculateCartStuff() {
-  totalAmt = 0;
-  itemCnt = 0;
-
   const cartItems = cartDisp.children;
-  let subtotal = 0;
-  const itemDiscounts = [];
 
-  // Calculate individual items and discounts
-  for (let i = 0; i < cartItems.length; i++) {
-    const itemElement = cartItems[i];
-    const product = findProductById(itemElement.id);
-    const quantity = parseInt(
-      itemElement.querySelector('.quantity-number').textContent
-    );
-    const itemTotal = product.val * quantity;
+  // Calculate cart items and totals
+  const cartData = calculateCartItems(cartItems);
+  const { items, subtotal, totalQuantity } = cartData;
 
-    itemCnt += quantity;
-    subtotal += itemTotal;
+  // Calculate discounts
+  const discountData = calculateDiscounts(cartData);
+  const { totalAmount, itemDiscounts, discountRate } = discountData;
 
-    // Update visual styling for bulk items
-    const priceElements = itemElement.querySelectorAll('.text-lg, .text-xs');
-    priceElements.forEach((elem) => {
-      if (elem.classList.contains('text-lg')) {
-        elem.style.fontWeight =
-          quantity >= DISCOUNT_RATES.INDIVIDUAL_DISCOUNT_THRESHOLD
-            ? 'bold'
-            : 'normal';
-      }
-    });
+  // Update global state
+  totalAmt = totalAmount;
+  itemCnt = totalQuantity;
 
-    // Calculate individual product discounts
-    const individualDiscount = calculateIndividualDiscount(
-      product.id,
-      quantity
-    );
-    if (individualDiscount > 0) {
-      itemDiscounts.push({ name: product.name, discount: individualDiscount });
-      totalAmt += itemTotal * (1 - individualDiscount / 100);
-    } else {
-      totalAmt += itemTotal;
+  // Update visual styling for bulk items
+  items.forEach(({ product, quantity }) => {
+    const itemElement = document.getElementById(product.id);
+    if (itemElement) {
+      const priceElements = itemElement.querySelectorAll('.text-lg, .text-xs');
+      priceElements.forEach((elem) => {
+        if (elem.classList.contains('text-lg')) {
+          elem.style.fontWeight =
+            quantity >= DISCOUNT_RATES.INDIVIDUAL_DISCOUNT_THRESHOLD
+              ? 'bold'
+              : 'normal';
+        }
+      });
     }
-  }
-
-  const originalTotal = subtotal;
-  let discountRate = 0;
-
-  // Apply bulk purchase discount
-  const bulkDiscount = calculateBulkDiscount(itemCnt);
-  if (bulkDiscount > 0) {
-    totalAmt = subtotal * (1 - bulkDiscount / 100);
-    discountRate = bulkDiscount / 100;
-  } else {
-    discountRate = (subtotal - totalAmt) / subtotal;
-  }
-
-  // Apply Tuesday discount
-  const tuesdayDiscount = calculateTuesdayDiscount(totalAmt);
-  if (tuesdayDiscount > 0 && totalAmt > 0) {
-    totalAmt = totalAmt * (1 - tuesdayDiscount / 100);
-    discountRate = 1 - totalAmt / originalTotal;
-  }
+  });
 
   // Update UI
   updateItemCountDisplay(itemCnt);
   updateSummaryDetails(cartItems, subtotal, itemDiscounts);
-  updateDiscountInfo(discountRate, totalAmt, originalTotal);
+  updateDiscountInfo(discountRate, totalAmt, subtotal);
   updateTuesdaySpecialDisplay();
 
   // Update total display
