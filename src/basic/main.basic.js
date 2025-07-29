@@ -1,78 +1,78 @@
-var prodList;
+const PRODUCT_CONSTANTS = {
+  PRODUCT_ONE: 'p1',
+  PRODUCT_TWO: 'p2',
+  PRODUCT_THREE: 'p3',
+  PRODUCT_FOUR: 'p4',
+  PRODUCT_FIVE: 'p5',
+};
+const prodList = [
+  {
+    id: PRODUCT_CONSTANTS.PRODUCT_ONE,
+    name: '버그 없애는 키보드',
+    val: 10000,
+    originalVal: 10000,
+    q: 50,
+    onSale: false,
+    suggestSale: false,
+  },
+  {
+    id: PRODUCT_CONSTANTS.PRODUCT_TWO,
+    name: '생산성 폭발 마우스',
+    val: 20000,
+    originalVal: 20000,
+    q: 30,
+    onSale: false,
+    suggestSale: false,
+  },
+  {
+    id: PRODUCT_CONSTANTS.PRODUCT_THREE,
+    name: '거북목 탈출 모니터암',
+    val: 30000,
+    originalVal: 30000,
+    q: 20,
+    onSale: false,
+    suggestSale: false,
+  },
+  {
+    id: PRODUCT_CONSTANTS.PRODUCT_FOUR,
+    name: '에러 방지 노트북 파우치',
+    val: 15000,
+    originalVal: 15000,
+    q: 0,
+    onSale: false,
+    suggestSale: false,
+  },
+  {
+    id: PRODUCT_CONSTANTS.PRODUCT_FIVE,
+    name: `코딩할 때 듣는 Lo-Fi 스피커`,
+    val: 25000,
+    originalVal: 25000,
+    q: 10,
+    onSale: false,
+    suggestSale: false,
+  },
+];
 
-var stockInfo;
-var itemCnt;
-var lastSel;
-var sel;
-
-var totalAmt = 0;
-var PRODUCT_ONE = 'p1';
-var p2 = 'p2';
-var product_3 = 'p3';
-var p4 = 'p4';
-var PRODUCT_5 = `p5`;
-var cartDisp;
+let stockInfo;
+let itemCnt;
+let sel;
+let totalAmt = 0;
+let cartDisp;
 function main() {
   const rootElement = document.getElementById('app');
-  var header;
-  var gridContainer;
-  var leftColumn;
-  var selectorContainer;
-  var rightColumn;
-  var manualToggle;
-  var manualOverlay;
-  var manualColumn;
-  var lightningDelay;
+  let header;
+  let gridContainer;
+  let leftColumn;
+  let selectorContainer;
+  let rightColumn;
+  let manualToggle;
+  let manualOverlay;
+  let manualColumn;
+  let lightningDelay;
+
   totalAmt = 0;
   itemCnt = 0;
-  lastSel = null;
-  prodList = [
-    {
-      id: PRODUCT_ONE,
-      name: '버그 없애는 키보드',
-      val: 10000,
-      originalVal: 10000,
-      q: 50,
-      onSale: false,
-      suggestSale: false,
-    },
-    {
-      id: p2,
-      name: '생산성 폭발 마우스',
-      val: 20000,
-      originalVal: 20000,
-      q: 30,
-      onSale: false,
-      suggestSale: false,
-    },
-    {
-      id: product_3,
-      name: '거북목 탈출 모니터암',
-      val: 30000,
-      originalVal: 30000,
-      q: 20,
-      onSale: false,
-      suggestSale: false,
-    },
-    {
-      id: p4,
-      name: '에러 방지 노트북 파우치',
-      val: 15000,
-      originalVal: 15000,
-      q: 0,
-      onSale: false,
-      suggestSale: false,
-    },
-    {
-      id: PRODUCT_5,
-      name: `코딩할 때 듣는 Lo-Fi 스피커`,
-      val: 25000,
-      originalVal: 25000,
-      q: 10,
-      onSale: false,
-      suggestSale: false,
-    },
-  ];
+  let lastSel = null;
 
   header = document.createElement('div');
   header.className = 'mb-8';
@@ -471,24 +471,16 @@ function handleCalculateCartStuff() {
         }
       });
       if (q >= 10) {
-        if (curItem.id === PRODUCT_ONE) {
+        if (curItem.id === PRODUCT_CONSTANTS.PRODUCT_ONE) {
           disc = 10 / 100;
-        } else {
-          if (curItem.id === p2) {
-            disc = 15 / 100;
-          } else {
-            if (curItem.id === product_3) {
-              disc = 20 / 100;
-            } else {
-              if (curItem.id === p4) {
-                disc = 5 / 100;
-              } else {
-                if (curItem.id === PRODUCT_5) {
-                  disc = 25 / 100;
-                }
-              }
-            }
-          }
+        } else if (curItem.id === PRODUCT_CONSTANTS.PRODUCT_TWO) {
+          disc = 15 / 100;
+        } else if (curItem.id === PRODUCT_CONSTANTS.PRODUCT_THREE) {
+          disc = 20 / 100;
+        } else if (curItem.id === PRODUCT_CONSTANTS.PRODUCT_FOUR) {
+          disc = 5 / 100;
+        } else if (curItem.id === PRODUCT_CONSTANTS.PRODUCT_FIVE) {
+          disc = 25 / 100;
         }
         if (disc > 0) {
           itemDiscounts.push({ name: curItem.name, discount: disc * 100 });
@@ -674,11 +666,11 @@ const renderBonusPoints = function (currentTotalAmt, currentItemCnt, currentProd
       }
     }
     if (!product) continue;
-    if (product.id === PRODUCT_ONE) {
+    if (product.id === PRODUCT_CONSTANTS.PRODUCT_ONE) {
       hasKeyboard = true;
-    } else if (product.id === p2) {
+    } else if (product.id === PRODUCT_CONSTANTS.PRODUCT_TWO) {
       hasMouse = true;
-    } else if (product.id === product_3) {
+    } else if (product.id === PRODUCT_CONSTANTS.PRODUCT_THREE) {
       hasMonitorArm = true;
     }
   }
