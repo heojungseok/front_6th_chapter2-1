@@ -85,7 +85,7 @@ const prodList = [
   },
   {
     id: PRODUCT_CONSTANTS.PRODUCT_FIVE,
-    name: `코딩할 때 듣는 Lo-Fi 스피커`,
+    name: '코딩할 때 듣는 Lo-Fi 스피커',
     price: 25000,
     originalPrice: 25000,
     stockQuantity: 10,
@@ -131,6 +131,7 @@ function calculateBulkDiscount(totalQuantity) {
 }
 
 function calculateTuesdayDiscount(amount) {
+  // amount 파라미터는 향후 확장성을 위해 유지하되, 현재는 할인율만 반환
   return isTuesday() ? DISCOUNT_RATES.TUESDAY_DISCOUNT : 0;
 }
 
@@ -258,34 +259,42 @@ function calculateLoyaltyPoints(totalAmount, totalQuantity, cartItems) {
     pointsDetail.push('화요일 2배');
   }
 
-  // Product combination bonuses
-  const hasKeyboard = cartItems.some(
-    (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_ONE
-  );
-  const hasMouse = cartItems.some(
-    (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_TWO
-  );
-  const hasMonitorArm = cartItems.some(
-    (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_THREE
-  );
+  // 상품 조합 보너스 로직을 별도 함수로 분리하여 가독성과 재사용성을 높임
+  function getProductCombinationBonuses(cartItems) {
+    const hasKeyboard = cartItems.some(
+      (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_ONE
+    );
+    const hasMouse = cartItems.some(
+      (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_TWO
+    );
+    const hasMonitorArm = cartItems.some(
+      (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_THREE
+    );
 
-  if (hasKeyboard && hasMouse) {
-    finalPoints += POINTS_CONFIG.KEYBOARD_MOUSE_BONUS;
-    pointsDetail.push('키보드+마우스 세트 +50p');
+    const bonuses = [];
+    let bonusPoints = 0;
+
+    if (hasKeyboard && hasMouse) {
+      bonusPoints += POINTS_CONFIG.KEYBOARD_MOUSE_BONUS;
+      bonuses.push('키보드+마우스 세트 +50p');
+    }
+
+    if (hasKeyboard && hasMouse && hasMonitorArm) {
+      bonusPoints += POINTS_CONFIG.FULL_SET_BONUS;
+      bonuses.push('풀세트 구매 +100p');
+    }
+
+    return { bonusPoints, bonuses };
   }
 
-  if (hasKeyboard && hasMouse && hasMonitorArm) {
-    finalPoints += POINTS_CONFIG.FULL_SET_BONUS;
-    pointsDetail.push('풀세트 구매 +100p');
+  // 상품 조합 보너스 적용
+  const { bonusPoints, bonuses } = getProductCombinationBonuses(cartItems);
+  if (bonusPoints > 0) {
+    finalPoints += bonusPoints;
+    pointsDetail.push(...bonuses);
   }
 
-  // Bulk purchase bonuses
-  const bulkBonus =
-    POINTS_CONFIG.BULK_PURCHASE_BONUSES[30] ||
-    POINTS_CONFIG.BULK_PURCHASE_BONUSES[20] ||
-    POINTS_CONFIG.BULK_PURCHASE_BONUSES[10] ||
-    0;
-
+  // 대량 구매 보너스 적용
   if (totalQuantity >= 30) {
     finalPoints += POINTS_CONFIG.BULK_PURCHASE_BONUSES[30];
     pointsDetail.push('대량구매(30개+) +100p');
@@ -560,7 +569,10 @@ function createOrderSummary() {
 }
 
 function createManualOverlay() {
+  const manualOverlay = document.createElement('div');
+  const manualColumn = document.createElement('div');
   const manualToggle = document.createElement('button');
+
   manualToggle.className =
     'fixed top-4 right-4 bg-black text-white p-3 rounded-full hover:bg-gray-900 transition-colors z-50';
   manualToggle.innerHTML = `
@@ -573,7 +585,6 @@ function createManualOverlay() {
     manualColumn.classList.toggle('translate-x-full');
   };
 
-  const manualOverlay = document.createElement('div');
   manualOverlay.className =
     'fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300';
   manualOverlay.onclick = function (e) {
@@ -583,7 +594,6 @@ function createManualOverlay() {
     }
   };
 
-  const manualColumn = document.createElement('div');
   manualColumn.className =
     'fixed right-0 top-0 h-full w-80 bg-white shadow-2xl p-6 overflow-y-auto z-50 transform translate-x-full transition-transform duration-300';
   manualColumn.innerHTML = `
@@ -810,8 +820,6 @@ function startLightningSaleTimer() {
 function startRecommendationTimer() {
   setTimeout(function () {
     setInterval(function () {
-      if (cartItemsContainer.children.length === 0) {
-      }
       if (lastSel) {
         let suggest = null;
         for (let k = 0; k < prodList.length; k++) {
