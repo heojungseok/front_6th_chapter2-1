@@ -1,197 +1,191 @@
 # 리팩토링 작업 내역
 
-## 1. 전역 상태 및 상수 정리 (이전 작업)
+## 1. 전역 상태 및 상수 정리
 
-- 전역 변수들의 var → let/const 변환
-- 매직 넘버를 상수로 추출
-- 변수명 개선으로 의미 명확화
+- 매직 넘버를 의미 있는 상수로 추출
+  - `DISCOUNT_RATES`: 할인율 관련 상수
+  - `POINTS_CONFIG`: 포인트 적립 관련 상수
+  - `TIMING_CONFIG`: 타이머 관련 상수
+  - `STOCK_WARNING_THRESHOLD`: 재고 부족 경고 기준
+  - `LOW_STOCK_THRESHOLD`: 낮은 재고 기준
 
-## 2. main() 함수 분리 (이전 작업)
+## 2. 변수명 개선
 
-- DOM 생성 함수들 분리
-  - createHeader()
-  - createProductSelector()
-  - initializeCartDisplay()
-  - createOrderSummary()
-  - createManualOverlay()
-- 타이머 함수들 분리
-  - startLightningSaleTimer()
-  - startRecommendationTimer()
-- 초기화 로직을 initializeApp()으로 통합
+- 모호한 변수명을 명확하고 의미있게 변경
+  - `val` → `price` (가격)
+  - `originalVal` → `originalPrice` (원래 가격)
+  - `q` → `stockQuantity` (재고 수량)
+  - `onSale` → `isFlashSale` (번개세일 여부)
+  - `suggestSale` → `isRecommended` (추천 상품 여부)
+  - `lastSel` → `lastSelectedProductId` (마지막 선택 상품 ID)
+  - `prodList` → `productList` (상품 목록)
+  - `sum` → `cartTotalDisplay` (장바구니 총액 표시 DOM)
 
-## 3. 이벤트 핸들러 분리 (오늘 작업)
+## 3. 함수명 개선
 
-### 3.1 장바구니 클릭 이벤트 핸들러 분리
+- 함수의 역할을 더 명확하게 표현하는 이름으로 변경
+  - `handleAddToCart` → `insertProductToCart` (장바구니에 상품 추가)
+  - `handleCalculateCartStuff` → `updateCartCalculations` (장바구니 계산 업데이트)
 
-- handleCartItemClick(): 메인 클릭 이벤트 처리
-- handleQuantityChange(): 수량 변경 로직
-- handleRemoveItem(): 상품 제거 로직
+## 4. 코드 구조 개선
 
-### 3.2 재고 부족 알림 로직 추가
+### 4.1 할인 아이콘 로직 개선
 
-- 재고 5개 미만 시 콘솔 경고 메시지
-- 재고 2개 이하 시 추가 경고 메시지
+```javascript
+const discountIcon = `${product.isFlashSale ? '⚡' : ''}${product.isRecommended ? '💝' : ''}`;
+```
 
-## 4. React + TypeScript 전환 전 고려사항
+- 복잡한 삼항 연산자를 템플릿 리터럴로 단순화
+- 조건부 아이콘 표시 로직 개선
 
-### 4.1 상태 관리 중앙화
+### 4.2 가격 표시 로직 분리
 
-현재 문제점:
-
-- 전역 변수로 관리되는 상태들 (stockStatusDisplay, itemCount, totalAmount 등)
-- DOM 요소를 직접 참조하는 변수들 (productSelectElement, cartItemsContainer 등)
-
-개선 방향:
-
-```typescript
-interface CartState {
-  items: CartItem[];
-  totalAmount: number;
-  itemCount: number;
-  lastSelectedProduct: string | null;
-}
-
-interface ProductState {
-  products: Product[];
-  stockStatus: StockStatus;
+```javascript
+function getPriceDisplay(product) {
+  if (!product.isFlashSale && !product.isRecommended) {
+    return formatPrice(product.price);
+  }
+  const priceClass =
+    product.isFlashSale && product.isRecommended
+      ? 'text-purple-600'
+      : product.isFlashSale
+        ? 'text-red-500'
+        : 'text-blue-500';
+  return `
+    <span class="line-through text-gray-400">${formatPrice(product.originalPrice)}</span>
+    <span class="${priceClass}">${formatPrice(product.price)}</span>
+  `;
 }
 ```
 
-### 4.2 컴포넌트 구조 설계
+- 가격 표시 로직을 별도 함수로 분리
+- 할인 가격 표시 스타일 통합
 
-현재 DOM 생성 함수들의 React 컴포넌트화:
+  4.3 재고 부족 알림 로직 추가
 
-```typescript
-// 현재: function createHeader() { ... }
-// 변경: function Header() { ... }
-
-// 현재: function createProductSelector() { ... }
-// 변경: function ProductSelector({ onSelect }: ProductSelectorProps) { ... }
-
-// 현재: function createOrderSummary() { ... }
-// 변경: function OrderSummary({ items, discounts }: OrderSummaryProps) { ... }
-```
-
-### 4.3 이벤트 핸들링 개선
-
-현재 문제점:
-
-- DOM 이벤트에 직접 의존
-- 이벤트 위임 사용 (cartItemsContainer의 click 이벤트)
-- dataset 속성을 통한 데이터 전달
-
-개선 방향:
-
-```typescript
-// 현재: cartItemsContainer.addEventListener('click', handleCartItemClick);
-// 변경: <CartItem onQuantityChange={handleQuantityChange} onRemove={handleRemove} />
-```
-
-### 4.4 비즈니스 로직 분리
-
-현재 문제점:
-
-- UI 로직과 비즈니스 로직이 혼재
-- DOM 조작과 상태 업데이트가 결합
-
-분리 대상:
-
-1. 할인 계산 로직
-
-   ```typescript
-   class DiscountService {
-     calculateIndividualDiscount(product: Product, quantity: number): number;
-     calculateBulkDiscount(totalQuantity: number): number;
-     calculateTuesdayDiscount(amount: number): number;
-   }
-   ```
-
-2. 포인트 계산 로직
-
-   ```typescript
-   class LoyaltyPointService {
-     calculatePoints(purchase: Purchase): PointCalculation;
-   }
-   ```
-
-3. 재고 관리 로직
-   ```typescript
-   class InventoryService {
-     checkStock(productId: string): StockStatus;
-     updateStock(productId: string, quantity: number): void;
-   }
-   ```
-
-### 4.5 타이머 로직 개선
-
-현재 문제점:
-
-- setInterval과 setTimeout의 직접 사용
-- 랜덤 값 사용으로 테스트 어려움
-- 컴포넌트 언마운트 시 정리되지 않는 타이머
-
-개선 방향:
-
-```typescript
-function useSaleTimer(config: TimerConfig) {
-  useEffect(() => {
-    const timer = startTimer();
-    return () => clearTimer(timer);
-  }, [config]);
+```javascript
+if (product && product.stockQuantity < STOCK_WARNING_THRESHOLD) {
+  console.warn(
+    `⚠️ ${product.name}의 재고가 부족합니다. (${product.stockQuantity}개 남음)`
+  );
+  if (product.stockQuantity <= 2) {
+    console.log(`🚨 ${product.name}의 재고가 거의 소진되었습니다!`);
+  }
 }
 ```
 
-### 4.6 타입 정의
+- 재고 부족 시 경고 메시지 표시
+- 심각한 재고 부족 시 추가 알림
 
-필요한 타입 정의:
+## 5. 다음 단계 계획
 
-```typescript
-interface Product {
-  id: string;
-  name: string;
-  val: number;
-  originalVal: number;
-  q: number;
-  onSale: boolean;
-  suggestSale: boolean;
-}
+### 5.1 우선순위가 높은 작업
 
-interface CartItem {
-  productId: string;
-  quantity: number;
-}
+- 타이머 관련 버그 수정 (lightning sale, recommendation)
+- 재고 복구 버그 수정 (장바구니에서 아이템 제거 시)
+- 이벤트 핸들러 정리 (handleCartItemClick, handleQuantityChange, handleRemoveItem)
 
-interface Discount {
-  type: 'individual' | 'bulk' | 'tuesday' | 'flash' | 'recommendation';
-  rate: number;
-  conditions: DiscountConditions;
-}
+### 5.2 중기 작업
 
-interface LoyaltyPoints {
-  base: number;
-  bonuses: PointBonus[];
-  total: number;
-}
-```
-
-## 5. 남은 작업 우선순위
-
-### 5.1 높은 우선순위
-
-- 타이머 관련 버그 수정
-- 재고 복구 버그 수정
-
-### 5.2 중간 우선순위
-
-- 성능 최적화
+- DOM 조작 로직 추가 분리
+- 불필요한 리렌더링 최적화
 - 에러 처리 강화
 
-### 5.3 낮은 우선순위
+### 5.3 장기 작업
 
-- UI/UX 개선
+- React + TypeScript 전환 준비
+- UI/UX 개선 (로딩 상태, 애니메이션 등)
+- 테스트 커버리지 향상
 
-## 6. 테스트 현황
+## 6. 코드 분석 및 개선 필요 사항
 
-- 총 테스트 케이스: 103개
-- 통과: 87개
-- 스킵: 16개 (타이머 관련 13개, 재고 복구 관련 3개)
+### 6.1 데이터 모델 분리 필요
+
+- 상수와 상품 데이터가 main.basic.js에 직접 포함됨
+- 분리 대상:
+  ```javascript
+  // productData.js로 분리 필요
+  const PRODUCT_CONSTANTS = { ... }
+  const DISCOUNT_RATES = { ... }
+  const POINTS_CONFIG = { ... }
+  const TIMING_CONFIG = { ... }
+  const productList = [ ... ]
+  ```
+
+### 6.2 DOM 조작 최적화 필요
+
+- innerHTML 사용으로 인한 불필요한 리렌더링 발생
+
+  ```javascript
+  // 현재
+  summaryDetails.innerHTML += `...`;
+
+  // 개선 방향
+  const div = document.createElement('div');
+  div.textContent = '...';
+  summaryDetails.appendChild(div);
+  ```
+
+### 6.3 타이머 로직 개선 필요
+
+- 랜덤 값 사용으로 테스트가 어려움
+- 타이머 정리(cleanup) 로직 부재
+- 개선 필요한 함수들:
+  - startLightningSaleTimer()
+  - startRecommendationTimer()
+
+### 6.4 이벤트 핸들링 개선 필요
+
+- 이벤트 위임 패턴 사용 중이나 타입 체크가 불안정
+- dataset 속성을 통한 데이터 전달이 불안정
+- 개선 대상:
+  - handleCartItemClick
+  - handleQuantityChange
+  - handleRemoveItem
+
+### 6.5 상태 관리 개선 필요
+
+현재 전역 상태:
+
+```javascript
+let stockStatusDisplay;
+let itemCount;
+let productSelectElement;
+let totalAmount = 0;
+let cartItemsContainer;
+let cartTotalDisplay;
+let lastSelectedProductId = null;
+```
+
+- 전역 변수 사용으로 인한 사이드 이펙트 위험
+- DOM 요소 직접 참조로 인한 결합도 증가
+
+### 6.6 HTML 템플릿 관리
+
+- 템플릿 문자열이 함수 내부에 직접 포함됨
+- 재사용성과 유지보수성 저하
+- 분리 대상:
+  - createHeader
+  - createProductSelector
+  - createOrderSummary
+  - createCartItem
+
+## 7. 우선순위별 개선 계획
+
+### 7.1 높은 우선순위
+
+1. 데이터 모델 분리 (상수, 상품 데이터)
+2. 타이머 로직 개선
+3. 전역 상태 관리 개선
+
+### 7.2 중간 우선순위
+
+1. DOM 조작 최적화
+2. 이벤트 핸들링 개선
+3. HTML 템플릿 분리
+
+### 7.3 낮은 우선순위
+
+1. 테스트 커버리지 향상
+2. 성능 최적화
+3. 에러 처리 강화
