@@ -353,6 +353,36 @@ function initializeApp() {
   updateCartCalculations();
 }
 
+// 계산 로직 분리 - 순수 함수로 작성
+function calculateCartSummary(cartItems) {
+  // Calculate cart items and totals
+  const cartData = calculateCartItems(cartItems);
+  const { items, subtotal, totalQuantity } = cartData;
+
+  // Calculate discounts
+  const discountData = calculateDiscounts(cartData);
+  const {
+    totalAmount: calculatedTotalAmount,
+    itemDiscounts,
+    discountRate,
+  } = discountData;
+
+  // Calculate loyalty points
+  const loyaltyPoints = calculateLoyaltyPoints(
+    calculatedTotalAmount,
+    totalQuantity,
+    Array.from(cartItems)
+  );
+
+  return {
+    items,
+    subtotal,
+    totalQuantity,
+    discountData,
+    loyaltyPoints
+  };
+}
+
 function updateCartCalculations() {
   const cartItemsContainer = getRequiredElement(
     getCartItemsContainer,
@@ -366,17 +396,11 @@ function updateCartCalculations() {
 
   const cartItems = cartItemsContainer.children;
 
-  // Calculate cart items and totals
-  const cartData = calculateCartItems(cartItems);
-  const { items, subtotal, totalQuantity } = cartData;
-
-  // Calculate discounts
-  const discountData = calculateDiscounts(cartData);
-  const {
-    totalAmount: calculatedTotalAmount,
-    itemDiscounts,
-    discountRate,
-  } = discountData;
+  // 계산 로직을 별도 함수로 분리
+  const summary = calculateCartSummary(cartItems);
+  const { items, subtotal, totalQuantity, discountData, loyaltyPoints } = summary;
+  const { totalAmount: calculatedTotalAmount, itemDiscounts, discountRate } = discountData;
+  const { finalPoints, pointsDetail } = loyaltyPoints;
 
   // Update global state
   // setTotalAmount(calculatedTotalAmount); // This line was removed from imports
@@ -410,12 +434,7 @@ function updateCartCalculations() {
     totalDiv.textContent = formatPrice(Math.round(calculatedTotalAmount));
   }
 
-  // Calculate and display loyalty points
-  const { finalPoints, pointsDetail } = calculateLoyaltyPoints(
-    calculatedTotalAmount,
-    totalQuantity,
-    Array.from(cartItems)
-  );
+  // Update loyalty points display
   updateLoyaltyPointsDisplay(finalPoints, pointsDetail);
 
   // Update stock information
