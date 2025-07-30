@@ -444,7 +444,7 @@ function updateSummaryDetails(cartItems, subtotal, itemDiscounts) {
       <div class="flex justify-between text-sm tracking-wide">
         <span>Subtotal</span>
         <span>${formatPrice(subtotal)}</span>
-      </div>
+          </div>
     `;
 
     // Add bulk discount
@@ -461,8 +461,8 @@ function updateSummaryDetails(cartItems, subtotal, itemDiscounts) {
           <div class="flex justify-between text-sm tracking-wide text-green-400">
             <span class="text-xs">${item.name} (10개↑)</span>
             <span class="text-xs">-${item.discount}%</span>
-          </div>
-        `;
+        </div>
+      `;
       });
     }
 
@@ -800,7 +800,7 @@ function createCartItem(product) {
   cartItemElement.innerHTML = `
     <div class="w-20 h-20 bg-gradient-black relative overflow-hidden">
       <div class="absolute top-1/2 left-1/2 w-[60%] h-[60%] bg-white/10 -translate-x-1/2 -translate-y-1/2 rotate-45"></div>
-    </div>
+        </div>
     <div>
       <h3 class="text-base font-normal mb-1 tracking-tight">${discountIcon}${product.name}</h3>
       <p class="text-xs text-gray-500 mb-0.5 tracking-wide">PRODUCT</p>
@@ -810,12 +810,12 @@ function createCartItem(product) {
         <span class="quantity-number text-sm font-normal min-w-[20px] text-center tabular-nums">1</span>
         <button class="quantity-change w-6 h-6 border border-black bg-white text-sm flex items-center justify-center transition-all hover:bg-black hover:text-white" data-product-id="${product.id}" data-change="1">+</button>
       </div>
-    </div>
+        </div>
     <div class="text-right">
       <div class="text-lg mb-2 tracking-tight tabular-nums">${priceDisplay}</div>
       <a class="remove-item text-2xs text-gray-500 uppercase tracking-wider cursor-pointer transition-colors border-b border-transparent hover:text-black hover:border-black" data-product-id="${product.id}">Remove</a>
-    </div>
-  `;
+          </div>
+        `;
 
   cartItemsContainer.appendChild(cartItemElement);
   product.stockQuantity--;

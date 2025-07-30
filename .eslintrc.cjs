@@ -37,7 +37,7 @@ module.exports = {
       },
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'script', // module이 아닌 script로 설정
+        sourceType: 'module',
       },
       rules: {
         // 기본 JavaScript 규칙
