@@ -35,7 +35,7 @@ export interface ItemDiscount {
   productId: string;
   discountAmount: number;
   discountRate: number;
-  discountType: 'flash_sale' | 'recommendation' | 'bulk' | 'tuesday';
+  discountType: 'flash_sale' | 'recommendation' | 'bulk' | 'tuesday' | 'super_sale';
 }
 
 // 포인트 관련 타입

@@ -80,33 +80,60 @@ export const calculateTuesdayDiscount = (items: CartItem[]): ItemDiscount[] => {
   }));
 };
 
-// 번개세일 할인 계산 (타이머 오류로 인해 임시 비활성화)
-// TODO: 타이머 로직 개선 후 활성화 필요
-export const calculateFlashSaleDiscount = (items: CartItem[]): ItemDiscount[] => {
-  // 타이머 오류로 인해 임시 비활성화
-  // return items
-  //   .filter(item => item.product.isFlashSale)
-  //   .map(item => ({
-  //     productId: item.product.id,
-  //     discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.FLASH_SALE / 100),
-  //     discountRate: DISCOUNT_PERCENTAGES.FLASH_SALE / 100,
-  //     discountType: 'flash_sale'
-  //   }));
-  return [];
+// 번개세일 할인 계산
+export const calculateFlashSaleDiscount = (
+  items: CartItem[], 
+  flashSaleProductId: string | null
+): ItemDiscount[] => {
+  if (!flashSaleProductId) return [];
+
+  return items
+    .filter(item => item.product.id === flashSaleProductId)
+    .map(item => ({
+      productId: item.product.id,
+      discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.FLASH_SALE / 100),
+      discountRate: DISCOUNT_PERCENTAGES.FLASH_SALE / 100,
+      discountType: 'flash_sale'
+    }));
 };
 
-// 추천할인 계산 (타이머 오류로 인해 임시 비활성화)
-// TODO: 타이머 로직 개선 후 활성화 필요
-export const calculateRecommendationDiscount = (items: CartItem[]): ItemDiscount[] => {
-  // 타이머 오류로 인해 임시 비활성화
-  // return items
-  //   .filter(item => item.product.isRecommended)
-  //   .map(item => ({
-  //     productId: item.product.id,
-  //     discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.RECOMMENDATION / 100),
-  //     discountRate: DISCOUNT_PERCENTAGES.RECOMMENDATION / 100,
-  //     discountType: 'recommendation'
-  //   }));
+// 추천할인 계산
+export const calculateRecommendationDiscount = (
+  items: CartItem[], 
+  recommendationProductId: string | null
+): ItemDiscount[] => {
+  if (!recommendationProductId) return [];
+
+  return items
+    .filter(item => item.product.id === recommendationProductId)
+    .map(item => ({
+      productId: item.product.id,
+      discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.RECOMMENDATION / 100),
+      discountRate: DISCOUNT_PERCENTAGES.RECOMMENDATION / 100,
+      discountType: 'recommendation'
+    }));
+};
+
+// SUPER SALE 할인 계산 (번개세일 + 추천할인 동시 적용)
+export const calculateSuperSaleDiscount = (
+  items: CartItem[],
+  flashSaleProductId: string | null,
+  recommendationProductId: string | null
+): ItemDiscount[] => {
+  if (!flashSaleProductId || !recommendationProductId) return [];
+
+  // 번개세일과 추천할인이 같은 상품에 적용되는 경우
+  if (flashSaleProductId === recommendationProductId) {
+    return items
+      .filter(item => item.product.id === flashSaleProductId)
+      .map(item => ({
+        productId: item.product.id,
+        discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.SUPER_SALE / 100),
+        discountRate: DISCOUNT_PERCENTAGES.SUPER_SALE / 100,
+        discountType: 'super_sale'
+      }));
+  }
+
   return [];
 };
 
@@ -126,7 +153,11 @@ export const mergeDiscounts = (allDiscounts: ItemDiscount[][]): ItemDiscount[] =
 };
 
 // 전체 할인 계산
-export const calculateDiscounts = (items: CartItem[]): DiscountData => {
+export const calculateDiscounts = (
+  items: CartItem[],
+  flashSaleProductId: string | null = null,
+  recommendationProductId: string | null = null
+): DiscountData => {
   if (items.length === 0) {
     return {
       totalAmount: 0,
@@ -141,8 +172,9 @@ export const calculateDiscounts = (items: CartItem[]): DiscountData => {
   const individualDiscounts = items.map(calculateIndividualDiscount);
   const bulkDiscounts = calculateBulkDiscount(items);
   const tuesdayDiscounts = calculateTuesdayDiscount(items);
-  const flashSaleDiscounts = calculateFlashSaleDiscount(items);
-  const recommendationDiscounts = calculateRecommendationDiscount(items);
+  const flashSaleDiscounts = calculateFlashSaleDiscount(items, flashSaleProductId);
+  const recommendationDiscounts = calculateRecommendationDiscount(items, recommendationProductId);
+  const superSaleDiscounts = calculateSuperSaleDiscount(items, flashSaleProductId, recommendationProductId);
 
   // 할인 중복 처리
   const allDiscounts = [
@@ -150,7 +182,8 @@ export const calculateDiscounts = (items: CartItem[]): DiscountData => {
     bulkDiscounts,
     tuesdayDiscounts,
     flashSaleDiscounts,
-    recommendationDiscounts
+    recommendationDiscounts,
+    superSaleDiscounts
   ];
 
   const finalDiscounts = mergeDiscounts(allDiscounts);
