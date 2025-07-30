@@ -4,6 +4,8 @@ import { addToCart, removeFromCart, updateCartItemQuantity, calculateCartSummary
 import { Product, CartItem } from './types';
 import { CURRENCY_SYMBOL } from './constants';
 import Header from './components/Header';
+import ProductSelector from './components/ProductSelector';
+import CartItem from './components/CartItem';
 
 const App: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -65,29 +67,12 @@ const App: React.FC = () => {
           {/* 좌측: 상품 선택 및 장바구니 */}
           <div className="bg-white border border-gray-200 p-8 rounded-lg">
             {/* 상품 선택 */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">상품 선택</h2>
-              <div className="space-y-4">
-                <select 
-                  value={selectedProductId}
-                  onChange={(e) => handleProductSelect(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {productList.map(product => (
-                    <option key={product.id} value={product.id}>
-                      {product.name} - {CURRENCY_SYMBOL}{product.price.toLocaleString()} 
-                      {product.stockQuantity === 0 ? ' (품절)' : ` (재고: ${product.stockQuantity}개)`}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleAddToCart}
-                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  장바구니에 추가
-                </button>
-              </div>
-            </div>
+            <ProductSelector
+              products={productList}
+              selectedProductId={selectedProductId}
+              onProductSelect={handleProductSelect}
+              onAddToCart={handleAddToCart}
+            />
             
             {/* 장바구니 */}
             <div>
@@ -99,42 +84,12 @@ const App: React.FC = () => {
               ) : (
                 <div className="space-y-4">
                   {cartItems.map(item => (
-                    <div key={item.product.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h3 className="font-semibold text-gray-800">{item.product.name}</h3>
-                          <p className="text-gray-600">
-                            {CURRENCY_SYMBOL}{item.product.price.toLocaleString()} × {item.quantity}
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleQuantityChange(item.product.id, -1)}
-                            className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
-                          >
-                            -
-                          </button>
-                          <span className="w-8 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => handleQuantityChange(item.product.id, 1)}
-                            className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
-                          >
-                            +
-                          </button>
-                          <button
-                            onClick={() => handleRemoveItem(item.product.id)}
-                            className="ml-2 text-red-600 hover:text-red-800"
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-right">
-                        <span className="font-semibold text-gray-800">
-                          {CURRENCY_SYMBOL}{item.itemTotal.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
+                    <CartItem
+                      key={item.product.id}
+                      item={item}
+                      onQuantityChange={handleQuantityChange}
+                      onRemoveItem={handleRemoveItem}
+                    />
                   ))}
                 </div>
               )}
