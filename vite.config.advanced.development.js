@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist/advanced',
-    base: '', // 빈 문자열로 설정
+    base: '', // 개발용 - 상대 경로
   },
   test: {
     globals: true,

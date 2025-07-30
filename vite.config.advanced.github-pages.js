@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist/advanced',
-    base: '', // 빈 문자열로 설정
+    base: '/front_6th_chapter2-1/', // GitHub Pages용 - 레포지토리명 기반 경로
   },
   test: {
     globals: true,

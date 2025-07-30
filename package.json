@@ -7,8 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "build:advanced": "vite build --config vite.config.advanced.js",
+    "build:advanced:dev": "vite build --config vite.config.advanced.development.js",
+    "build:advanced:gh-pages": "vite build --config vite.config.advanced.github-pages.js",
+    "build:advanced:prod": "vite build --config vite.config.advanced.production.js",
     "preview": "vite preview",
     "preview:advanced": "vite preview --config vite.config.advanced.js",
+    "preview:advanced:dev": "vite preview --config vite.config.advanced.development.js",
+    "preview:advanced:gh-pages": "vite preview --config vite.config.advanced.github-pages.js",
+    "preview:advanced:prod": "vite preview --config vite.config.advanced.production.js",
     "start:basic": "vite serve --open ./index.basic.html",
     "start:advanced": "vite serve --open ./index.advanced.html",
     "test": "vitest",
@@ -16,7 +22,12 @@
     "test:advanced": "vitest advanced.test.js",
     "test:ui": "vitest --ui",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "clean": "rm -rf dist",
+    "clean:advanced": "rm -rf dist/advanced",
+    "deploy:dev": "./scripts/deploy.sh dev",
+    "deploy:gh-pages": "./scripts/deploy.sh gh-pages",
+    "deploy:prod": "./scripts/deploy.sh prod"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
