@@ -57,7 +57,7 @@ export class TimerService {
   // 번개세일 타이머 시작
   private startFlashSaleTimer(): void {
     // 0-10초 랜덤 시작 시간
-    const randomStartDelay = Math.random() * 10000;
+    const randomStartDelay = Math.random() * TIMING_CONFIG.FLASH_SALE_START_DELAY_MAX;
     
     this.flashSaleStartTimer = setTimeout(() => {
       this.activateFlashSale();
@@ -65,14 +65,14 @@ export class TimerService {
       // 30초 주기로 반복
       this.flashSaleTimer = setInterval(() => {
         this.activateFlashSale();
-      }, 30000);
+      }, TIMING_CONFIG.FLASH_SALE_INTERVAL);
     }, randomStartDelay);
   }
 
   // 추천할인 타이머 시작
   private startRecommendationTimer(): void {
     // 0-20초 랜덤 시작 시간
-    const randomStartDelay = Math.random() * 20000;
+    const randomStartDelay = Math.random() * TIMING_CONFIG.RECOMMENDATION_START_DELAY_MAX;
     
     this.recommendationStartTimer = setTimeout(() => {
       this.activateRecommendation();
@@ -80,7 +80,7 @@ export class TimerService {
       // 60초 주기로 반복
       this.recommendationTimer = setInterval(() => {
         this.activateRecommendation();
-      }, 60000);
+      }, TIMING_CONFIG.RECOMMENDATION_INTERVAL);
     }, randomStartDelay);
   }
 

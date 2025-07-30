@@ -1,6 +1,7 @@
 import React from 'react';
 import { CartItem as CartItemType } from '../types';
 import { useTimer } from '../contexts/TimerContext';
+import { getDiscountType } from '../utils/discountUtils';
 import CartItem from './CartItem';
 
 interface CartContainerProps {
@@ -18,24 +19,11 @@ const CartContainer: React.FC<CartContainerProps> = ({
   
   // 할인 타입 확인 함수
   const getItemDiscountType = (productId: string) => {
-    const { flashSaleProductId, recommendationProductId } = timerState;
-    
-    // SUPER SALE (번개세일 + 추천할인 동시 적용)
-    if (flashSaleProductId === productId && recommendationProductId === productId) {
-      return 'super_sale';
-    }
-    
-    // 번개세일
-    if (flashSaleProductId === productId) {
-      return 'flash_sale';
-    }
-    
-    // 추천할인
-    if (recommendationProductId === productId) {
-      return 'recommendation';
-    }
-    
-    return null;
+    return getDiscountType(
+      productId,
+      timerState.flashSaleProductId,
+      timerState.recommendationProductId
+    );
   };
 
   return (

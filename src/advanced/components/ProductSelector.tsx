@@ -2,6 +2,7 @@ import React from 'react';
 import { Product } from '../types';
 import { CURRENCY_SYMBOL, PRODUCT_CONSTANTS } from '../constants';
 import { useTimer } from '../contexts/TimerContext';
+import { getDiscountType } from '../utils/discountUtils';
 import StockStatus from './StockStatus';
 import DiscountIcon from './DiscountIcon';
 
@@ -32,30 +33,11 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
 
   // 선택된 상품의 할인 상태 확인
   const selectedProduct = products.find(p => p.id === selectedProductId);
-  const getSelectedProductDiscountType = () => {
-    if (!selectedProduct) return null;
-    
-    const { flashSaleProductId, recommendationProductId } = timerState;
-    
-    // SUPER SALE (번개세일 + 추천할인 동시 적용)
-    if (flashSaleProductId === selectedProductId && recommendationProductId === selectedProductId) {
-      return 'super_sale';
-    }
-    
-    // 번개세일
-    if (flashSaleProductId === selectedProductId) {
-      return 'flash_sale';
-    }
-    
-    // 추천할인
-    if (recommendationProductId === selectedProductId) {
-      return 'recommendation';
-    }
-    
-    return null;
-  };
-
-  const discountType = getSelectedProductDiscountType();
+  const discountType = getDiscountType(
+    selectedProductId,
+    timerState.flashSaleProductId,
+    timerState.recommendationProductId
+  );
 
   return (
     <div className="mb-8">

@@ -3,6 +3,7 @@ import { productList } from './data/productData';
 import { addToCart, removeFromCart, updateCartItemQuantity } from './services/cartService';
 import { CartItem } from './types';
 import { TimerProvider, useTimer } from './contexts/TimerContext';
+import { useErrorHandler } from './hooks/useErrorHandler';
 import Header from './components/Header';
 import ProductSelector from './components/ProductSelector';
 import CartContainer from './components/CartContainer';
@@ -13,6 +14,7 @@ const AppContent: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>('product1');
   const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
+  const { showStockError, showProductNotFoundError } = useErrorHandler();
   
   // 상품 선택 핸들러
   const handleProductSelect = (productId: string) => {
@@ -22,12 +24,15 @@ const AppContent: React.FC = () => {
   // 장바구니에 상품 추가
   const handleAddToCart = () => {
     const selectedProduct = productList.find(p => p.id === selectedProductId);
-    if (!selectedProduct) return;
+    if (!selectedProduct) {
+      showProductNotFoundError(selectedProductId);
+      return;
+    }
     
     // 재고 확인
     const currentQuantity = cartItems.find(item => item.product.id === selectedProductId)?.quantity || 0;
     if (selectedProduct.stockQuantity <= currentQuantity) {
-      alert('재고가 부족합니다.');
+      showStockError(selectedProduct.name);
       return;
     }
     
