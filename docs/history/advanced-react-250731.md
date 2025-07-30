@@ -98,7 +98,50 @@ src/advanced/
 
 - ✅ **Basic 테스트**: 87개 통과, 16개 스킵 (기존과 동일)
 - ❌ **Advanced 테스트**: 2개 실패 (기존 문제, 설정과 무관)
-- ✅ **설정 완료**: React + TypeScript 환경 정상 구축
+
+## 개발 진행 타임라인
+
+### **Phase 1: React + TypeScript 환경 구축** ✅
+- React, TypeScript 패키지 설치
+- Vite 설정 파일 생성
+- 타입 정의, 상수, 데이터 모델 생성
+
+### **Phase 2: 하이브리드 개발** ✅
+- 서비스 레이어 생성 (discountService, loyaltyService, cartService)
+- 기본 App 컴포넌트에 기능 통합
+- 타이머 기능 임시 비활성화 (오류 해결)
+
+### **Phase 3: 컴포넌트 기반 아키텍처 전환** 🔄
+
+#### **1단계: Header 컴포넌트 분리** ✅ (2025-07-31)
+- **Header.tsx**: 재사용 가능한 헤더 컴포넌트 생성
+- **Props 인터페이스**: title, subtitle을 props로 받도록 설계
+- **기본값 설정**: props가 없어도 기본값으로 동작
+- **App.tsx 수정**: 기존 헤더 코드를 Header 컴포넌트로 교체
+- **빌드 성공**: 144ms로 정상 빌드 완료
+
+#### **2단계: ProductSelector 컴포넌트 분리** ✅ (2025-07-31)
+- **ProductSelector.tsx**: 상품 선택 기능을 독립적인 컴포넌트로 분리
+- **Props 인터페이스**: products, selectedProductId, onProductSelect, onAddToCart
+- **타입 안전성**: TypeScript 인터페이스로 Props 타입 정의
+- **클린코드 원칙**: 단일 책임 원칙, 의존성 주입, 재사용성
+- **빌드 성공**: 48ms, 기능 유지, 타입 체크 통과
+
+#### **3단계: CartItem 컴포넌트 분리** ✅ (2025-07-31)
+- **CartItem.tsx**: 장바구니 아이템 표시 기능을 독립적인 컴포넌트로 분리
+- **Props 인터페이스**: item, onQuantityChange, onRemoveItem
+- **이벤트 핸들러 캡슐화**: 컴포넌트 내부에서 이벤트 처리 로직 정리
+- **접근성 향상**: aria-label 추가로 스크린 리더 지원
+- **클린코드 원칙**: 단일 책임 원칙, 의존성 주입, 재사용성
+- **빌드 성공**: 145ms, 기능 유지, 타입 체크 통과
+
+#### **4단계: OrderSummary 컴포넌트 분리** 🔄 (예정)
+- 주문 요약 정보 표시 기능 분리
+- 할인, 포인트 계산 결과 표시
+
+#### **5단계: CartContainer 컴포넌트 분리** 🔄 (예정)
+- 장바구니 전체 컨테이너 분리
+- 장바구니 아이템 목록 관리
 
 ## 하이브리드 개발 완료 (2025-07-31)
 
