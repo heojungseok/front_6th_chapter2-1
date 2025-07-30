@@ -265,4 +265,319 @@ React + TypeScript 조합은 다음과 같은 방식으로 유지보수성을 �
 4. **테스트 용이성**으로 각 컴포넌트를 독립적으로 검증 가능
 5. **확장성**으로 새로운 기능을 기존 코드에 영향 없이 추가 가능
 
-이러한 개선사항들은 특히 대규모 프로젝트에서 코드의 안정성과 유지보수성을 크게 향상시킵니다. 
+이러한 개선사항들은 특히 대규모 프로젝트에서 코드의 안정성과 유지보수성을 크게 향상시킵니다.
+
+---
+
+# Phase 4: Context 패턴을 통한 클린코드 원칙 적용 (2025-01-XX)
+
+## 개요
+3단계 구현에서 타이머 시스템을 위해 Context 패턴을 도입하면서 클린코드 원칙을 실전에 적용한 사례를 분석합니다.
+
+## Context 패턴 도입 배경
+
+### **문제 상황**
+타이머 상태를 여러 컴포넌트에서 공유해야 하는 상황에서 발생한 문제들:
+
+```typescript
+// ❌ 기존 방식 (문제점)
+// App.tsx에서 타이머 상태 관리
+const [flashSaleProductId, setFlashSaleProductId] = useState(null);
+const [recommendationProductId, setRecommendationProductId] = useState(null);
+
+// ProductSelector.tsx에서도 같은 상태 필요
+// CartItem.tsx에서도 같은 상태 필요
+// → 상태 중복, 동기화 문제 발생
+```
+
+### **클린코드 원칙 적용**
+`docs/clean-code.md`와 `docs/05-clean-code-theory-lesson.md`에 명시된 클린코드 원칙을 적용하여 해결:
+
+## 1. 관심사의 분리 (Separation of Concerns)
+
+### **Before: 혼재된 관심사**
+```typescript
+// ❌ 비즈니스 로직과 UI 로직이 혼재
+function calcCart() {
+  // 계산 로직
+  totalAmt += itemTot * (1 - disc);
+  
+  // DOM 직접 조작
+  elem.style.fontWeight = q >= 10 ? 'bold' : 'normal';
+  
+  // 콘솔 로깅
+  console.log('할인 적용: ' + curItem.name);
+}
+```
+
+### **After: 관심사 분리**
+```typescript
+// ✅ TimerService (Model) - 순수 비즈니스 로직
+class TimerService {
+  private state: TimerState = { ... };
+  
+  initialize(products: Product[], callbacks: TimerCallbacks): void {
+    // 타이머 초기화 로직만 담당
+  }
+  
+  cleanup(): void {
+    // 타이머 정리 로직만 담당
+  }
+}
+
+// ✅ TimerContext (Controller) - 상태 관리 및 조정
+const TimerContext = createContext<TimerContextType>();
+const TimerProvider: React.FC = ({ children }) => {
+  // React 상태 관리만 담당
+  const [timerState, setTimerState] = useState<TimerState>({ ... });
+  
+  // 타이머 서비스와 React 상태 연결
+  useEffect(() => {
+    timerService.initialize(products, callbacks, setTimerState);
+    return () => timerService.cleanup();
+  }, []);
+  
+  return (
+    <TimerContext.Provider value={{ timerState, updateLastSelectedProduct }}>
+      {children}
+    </TimerContext.Provider>
+  );
+};
+
+// ✅ 컴포넌트들 (View) - UI 렌더링만
+const ProductSelector: React.FC = () => {
+  const { timerState } = useTimer(); // 상태만 사용
+  return <div>...</div>; // UI만 렌더링
+};
+```
+
+**클린코드 원칙 적용 효과:**
+- ✅ **Model-View-Controller 패턴**: 각 레이어가 명확한 책임 분담
+- ✅ **순수 함수**: TimerService는 순수 비즈니스 로직만 담당
+- ✅ **UI 독립성**: 컴포넌트는 UI 렌더링만 담당
+
+## 2. 단일 책임 원칙 (Single Responsibility Principle)
+
+### **Before: 하나의 함수가 여러 책임**
+```typescript
+// ❌ 하나의 함수가 너무 많은 일을 함
+function handleTimerLogic() {
+  // 1. 타이머 시작
+  // 2. 상태 업데이트
+  // 3. UI 업데이트
+  // 4. 알림 표시
+  // 5. 로깅
+  // ... 50줄 이상의 복잡한 로직
+}
+```
+
+### **After: 각 모듈이 하나의 책임만**
+```typescript
+// ✅ TimerService - 타이머 관리만 담당
+class TimerService {
+  startFlashSaleTimer(): void {
+    // 타이머 시작만 담당
+  }
+  
+  cleanup(): void {
+    // 타이머 정리만 담당
+  }
+}
+
+// ✅ TimerContext - 상태 공유만 담당
+const TimerContext = createContext<TimerContextType>();
+// 컴포넌트 간 상태 공유만 담당
+
+// ✅ 컴포넌트들 - UI 렌더링만 담당
+const CartItem: React.FC = () => {
+  // UI 렌더링만 담당
+};
+```
+
+**클린코드 원칙 적용 효과:**
+- ✅ **함수 길이 제한**: 각 함수가 20줄 이하로 유지
+- ✅ **명확한 책임**: 각 모듈의 역할이 명확히 정의됨
+- ✅ **수정 용이성**: 특정 기능 수정 시 해당 모듈만 변경
+
+## 3. 의존성 역전 원칙 (Dependency Inversion Principle)
+
+### **Before: 구체적인 구현에 직접 의존**
+```typescript
+// ❌ 고수준 모듈이 저수준 모듈에 직접 의존
+class ProductSelector {
+  constructor() {
+    this.timerService = new TimerService(); // 직접 의존
+  }
+  
+  render() {
+    // DOM 요소에 직접 접근
+    const element = document.getElementById('timer-display');
+    element.textContent = this.timerService.getState();
+  }
+}
+```
+
+### **After: 추상화에 의존**
+```typescript
+// ✅ Context를 통한 의존성 주입
+const TimerContext = createContext<TimerContextType>();
+
+// 컴포넌트는 Context에 의존 (구체적인 구현에 의존하지 않음)
+const useTimer = (): TimerContextType => {
+  const context = useContext(TimerContext);
+  if (context === undefined) {
+    throw new Error('useTimer must be used within a TimerProvider');
+  }
+  return context;
+};
+
+// 컴포넌트에서 사용
+const ProductSelector: React.FC = () => {
+  const { timerState } = useTimer(); // 추상화된 인터페이스 사용
+  return <div>{timerState.flashSaleProductId}</div>;
+};
+```
+
+**클린코드 원칙 적용 효과:**
+- ✅ **인터페이스 의존**: 구체적인 구현보다 추상화에 의존
+- ✅ **테스트 용이성**: 의존성을 쉽게 모킹하여 테스트 가능
+- ✅ **유연성**: 구현체를 쉽게 교체 가능
+
+## 4. 재사용성 (Reusability)
+
+### **Before: 중복된 상태 관리**
+```typescript
+// ❌ 각 컴포넌트에서 개별적으로 상태 관리
+function ProductSelector() {
+  const [flashSaleProductId, setFlashSaleProductId] = useState(null);
+  // 중복된 상태 관리 로직
+}
+
+function CartItem() {
+  const [flashSaleProductId, setFlashSaleProductId] = useState(null);
+  // 동일한 상태 관리 로직 중복
+}
+```
+
+### **After: 공유 가능한 상태**
+```typescript
+// ✅ Context를 통한 상태 공유
+const TimerProvider: React.FC = ({ children }) => {
+  const [timerState, setTimerState] = useState<TimerState>({ ... });
+  
+  return (
+    <TimerContext.Provider value={{ timerState, updateLastSelectedProduct }}>
+      {children}
+    </TimerContext.Provider>
+  );
+};
+
+// 모든 컴포넌트에서 동일한 상태 사용
+const ProductSelector: React.FC = () => {
+  const { timerState } = useTimer();
+  // 공유된 상태 사용
+};
+
+const CartItem: React.FC = () => {
+  const { timerState } = useTimer();
+  // 동일한 공유 상태 사용
+};
+```
+
+**클린코드 원칙 적용 효과:**
+- ✅ **DRY 원칙**: 중복 코드 제거
+- ✅ **일관성**: 모든 컴포넌트가 동일한 상태 사용
+- ✅ **유지보수성**: 상태 변경 시 한 곳만 수정
+
+## 5. 테스트 용이성 (Testability)
+
+### **Before: 테스트하기 어려운 구조**
+```typescript
+// ❌ DOM에 직접 의존하여 테스트 어려움
+function updateTimerDisplay() {
+  const element = document.getElementById('timer-display');
+  element.textContent = timerState.flashSaleProductId;
+}
+
+// 테스트 시 DOM 환경 필요
+test('should update timer display', () => {
+  // DOM 모킹 필요, 테스트 복잡
+});
+```
+
+### **After: 독립적으로 테스트 가능**
+```typescript
+// ✅ TimerService는 순수 로직으로 테스트 가능
+describe('TimerService', () => {
+  test('should start flash sale timer', () => {
+    const timerService = new TimerService();
+    timerService.initialize(mockProducts, mockCallbacks);
+    // 순수 로직 테스트, DOM 불필요
+  });
+});
+
+// ✅ TimerContext는 React 테스트 라이브러리로 테스트
+describe('TimerContext', () => {
+  test('should provide timer state', () => {
+    render(
+      <TimerProvider>
+        <TestComponent />
+      </TimerProvider>
+    );
+    // React Context 테스트
+  });
+});
+
+// ✅ 컴포넌트는 Props 기반으로 테스트
+describe('ProductSelector', () => {
+  test('should display flash sale icon', () => {
+    const mockTimerState = { flashSaleProductId: 'product1' };
+    render(<ProductSelector timerState={mockTimerState} />);
+    // Props 기반 테스트
+  });
+});
+```
+
+**클린코드 원칙 적용 효과:**
+- ✅ **단위 테스트**: 각 모듈을 독립적으로 테스트 가능
+- ✅ **모킹 용이성**: 의존성을 쉽게 모킹하여 테스트
+- ✅ **테스트 격리**: 각 테스트가 독립적으로 실행
+
+## 종합적인 클린코드 원칙 적용 효과
+
+### **1. 관심사의 분리**
+- **Model**: TimerService - 순수 비즈니스 로직
+- **View**: 컴포넌트들 - UI 렌더링
+- **Controller**: TimerContext - 상태 관리 및 조정
+
+### **2. 단일 책임 원칙**
+- **TimerService**: 타이머 관리만 담당
+- **TimerContext**: 상태 공유만 담당
+- **컴포넌트들**: UI 렌더링만 담당
+
+### **3. 의존성 역전**
+- **구체적인 구현보다 추상화에 의존**
+- **Context를 통한 의존성 주입**
+- **인터페이스 기반 설계**
+
+### **4. 재사용성**
+- **여러 컴포넌트에서 동일한 상태 공유**
+- **중복 코드 제거**
+- **일관된 상태 관리**
+
+### **5. 테스트 용이성**
+- **각 부분을 독립적으로 테스트 가능**
+- **의존성 모킹 용이**
+- **순수 함수와 컴포넌트 분리**
+
+## 결론
+
+Context 패턴을 도입하면서 클린코드 원칙을 실전에 적용한 결과:
+
+1. **관심사의 분리**: 타이머 로직과 UI 로직 분리
+2. **단일 책임 원칙**: 각 모듈이 하나의 명확한 책임만 담당
+3. **의존성 역전**: 구체적인 구현보다 추상화에 의존
+4. **재사용성**: 여러 컴포넌트에서 동일한 상태 공유
+5. **테스트 용이성**: 각 부분을 독립적으로 테스트 가능
+
+이는 `docs/clean-code.md`와 `docs/05-clean-code-theory-lesson.md`에 명시된 클린코드 원칙을 실전에 적용한 구체적인 사례로, 코드의 유지보수성과 확장성을 크게 향상시켰습니다. 
