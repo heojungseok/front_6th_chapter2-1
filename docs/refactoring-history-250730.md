@@ -82,24 +82,6 @@
 
 - **테스트 결과**: ✅ 모든 테스트 통과 (87 passed, 16 skipped, 0 failed)
 
-### 2025-01-27: 매직 넘버 및 하드코딩 문자열 상수화 완료
-
-- **작업 내용**:
-  - **상수 파일 생성**: 
-    - `src/basic/constants/ui.js` - UI 관련 상수 (통화, 색상, 클래스명, 에러메시지)
-    - `src/basic/constants/discount.js` - 할인 관련 상수 (아이콘, 라벨, 퍼센트)
-  - **하드코딩 값 상수화**:
-    - 통화 기호: `'₩'` → `CURRENCY_SYMBOL`
-    - CSS 클래스: `'text-purple-600 font-bold'` → `CSS_CLASSES.PURPLE_BOLD`
-    - 할인율: `25, 20, 5` → `DISCOUNT_PERCENTAGES.*`
-    - 할인 라벨: `'SUPER SALE!'` → `DISCOUNT_LABELS.SUPER_SALE`
-    - 에러 메시지: `'Product not found'` → `ERROR_MESSAGES.PRODUCT_NOT_FOUND`
-- **개선 효과**: 
-  - 코드 가독성 향상 (의미있는 상수명)
-  - 유지보수성 향상 (단일 소스 of truth)
-  - 오타 위험 감소
-  - 일관성 확보
-- **테스트 결과**: ✅ 모든 테스트 통과 (87 passed, 16 skipped)
 
 ### 2025-07-30: 이벤트 리스너 통합 완료
 
