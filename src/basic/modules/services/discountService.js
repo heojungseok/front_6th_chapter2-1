@@ -23,8 +23,7 @@ export function calculateBulkDiscount(totalQuantity) {
 }
 
 // Tuesday discount calculation
-export function calculateTuesdayDiscount(amount) {
-  // amount 파라미터는 향후 확장성을 위해 유지하되, 현재는 할인율만 반환
+export function calculateTuesdayDiscount() {
   return isTuesday() ? DISCOUNT_RATES.TUESDAY_DISCOUNT : 0;
 }
 
@@ -34,23 +33,25 @@ export function calculateDiscounts(cartData) {
   const itemDiscounts = [];
   let totalAmount = subtotal;
 
-  // 개별 상품 할인 계산
-  items.forEach(({ product, quantity, itemTotal }) => {
-    const discount = calculateIndividualDiscount(product.id, quantity);
-    if (discount > 0) {
-      itemDiscounts.push({ name: product.name, discount });
-      totalAmount -= itemTotal * (discount / 100);
-    }
-  });
-
-  // 전체 수량 할인
+  // 전체 수량 할인 확인
   const bulkDiscount = calculateBulkDiscount(totalQuantity);
+
   if (bulkDiscount > 0) {
+    // 전체 수량 할인이 적용되면 개별 상품 할인은 무시
     totalAmount = subtotal * (1 - bulkDiscount / 100);
+  } else {
+    // 개별 상품 할인 계산
+    items.forEach(({ product, quantity, itemTotal }) => {
+      const discount = calculateIndividualDiscount(product.id, quantity);
+      if (discount > 0) {
+        itemDiscounts.push({ name: product.name, discount });
+        totalAmount -= itemTotal * (discount / 100);
+      }
+    });
   }
 
   // 화요일 할인
-  const tuesdayDiscount = calculateTuesdayDiscount(totalAmount);
+  const tuesdayDiscount = calculateTuesdayDiscount();
   if (tuesdayDiscount > 0) {
     totalAmount *= 1 - tuesdayDiscount / 100;
   }
