@@ -1,3 +1,10 @@
+// 타이머 관리 모듈 import
+import {
+  startLightningSaleTimer,
+  startRecommendationTimer,
+  stopAllTimers,
+} from './modules/promotion/promotionScheduler.js';
+
 // Constants
 const PRODUCT_CONSTANTS = {
   PRODUCT_ONE: 'p1',
@@ -907,53 +914,9 @@ function handleCartItemClick(event) {
   updateSelectOptions();
 }
 
-// 타이머 함수들
-function startLightningSaleTimer() {
-  const lightningDelay = Math.random() * 10000;
-  setTimeout(() => {
-    setInterval(function () {
-      const luckyIdx = Math.floor(Math.random() * productList.length);
-      const luckyItem = productList[luckyIdx];
-      if (luckyItem.stockQuantity > 0 && !luckyItem.isFlashSale) {
-        luckyItem.price = Math.round((luckyItem.originalPrice * 80) / 100);
-        luckyItem.isFlashSale = true;
-        alert('⚡번개세일! ' + luckyItem.name + '이(가) 20% 할인 중입니다!');
-        updateSelectOptions();
-        updatePricesInCart();
-      }
-    }, 30000);
-  }, lightningDelay);
-}
-
-function startRecommendationTimer() {
-  setTimeout(function () {
-    setInterval(function () {
-      if (getLastSelectedProductId()) {
-        let suggest = null;
-        for (let k = 0; k < productList.length; k++) {
-          if (productList[k].id !== getLastSelectedProductId()) {
-            if (productList[k].stockQuantity > 0) {
-              if (!productList[k].isRecommended) {
-                suggest = productList[k];
-                break;
-              }
-            }
-          }
-        }
-        if (suggest) {
-          alert(
-            '💝 ' +
-              suggest.name +
-              '은(는) 어떠세요? 지금 구매하시면 5% 추가 할인!'
-          );
-          suggest.price = Math.round((suggest.price * (100 - 5)) / 100);
-          suggest.isRecommended = true;
-          updateSelectOptions();
-          updatePricesInCart();
-        }
-      }
-    }, 60000);
-  }, Math.random() * 20000);
+// 타이머 정리 함수 (모듈 함수 래핑)
+function cleanupTimers() {
+  stopAllTimers();
 }
 
 // 초기화 함수
@@ -990,9 +953,14 @@ function initializeApp() {
   updateSelectOptions();
   updateCartCalculations();
 
-  // 타이머 시작
-  startLightningSaleTimer();
-  startRecommendationTimer();
+  // 타이머 시작 (모듈 함수 사용)
+  startLightningSaleTimer(productList, updateSelectOptions, updatePricesInCart);
+  startRecommendationTimer(
+    productList,
+    getLastSelectedProductId,
+    updateSelectOptions,
+    updatePricesInCart
+  );
 }
 
 function updateCartCalculations() {
@@ -1060,6 +1028,9 @@ function updateCartCalculations() {
 
 // 최종 main 함수
 function main() {
+  // 기존 타이머 정리
+  cleanupTimers();
+
   setTotalAmount(0);
   setItemCount(0);
   setLastSelectedProductId(null);
