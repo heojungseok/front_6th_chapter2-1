@@ -169,6 +169,61 @@ function setLastSelectedProductId(id) {
   globalState.lastSelectedProductId = id;
 }
 
+// 중복 코드 제거를 위한 헬퍼 함수들
+function getRequiredElement(
+  getterFunction,
+  errorMessage = 'Required element not found'
+) {
+  const element = getterFunction();
+  if (!element) {
+    console.warn(errorMessage);
+    return null;
+  }
+  return element;
+}
+
+function getRequiredProduct(productId, errorMessage = 'Product not found') {
+  const product = findProductById(productId);
+  if (!product) {
+    console.warn(errorMessage);
+    return null;
+  }
+  return product;
+}
+
+function getPriceDisplay(product) {
+  if (!product.isFlashSale && !product.isRecommended) {
+    return formatPrice(product.price);
+  }
+
+  const priceClass =
+    product.isFlashSale && product.isRecommended
+      ? 'text-purple-600'
+      : product.isFlashSale
+        ? 'text-red-500'
+        : 'text-blue-500';
+
+  return `
+    <span class="line-through text-gray-400">${formatPrice(product.originalPrice)}</span>
+    <span class="${priceClass}">${formatPrice(product.price)}</span>
+  `;
+}
+
+function getDiscountIcon(product) {
+  return `${product.isFlashSale ? '⚡' : ''}${product.isRecommended ? '💝' : ''}`;
+}
+
+function getDiscountClassName(product) {
+  if (product.isFlashSale && product.isRecommended) {
+    return 'text-purple-600 font-bold';
+  } else if (product.isFlashSale) {
+    return 'text-red-500 font-bold';
+  } else if (product.isRecommended) {
+    return 'text-blue-500 font-bold';
+  }
+  return '';
+}
+
 // Utility functions
 function findProductById(productId) {
   return productList.find((product) => product.id === productId);
@@ -224,24 +279,34 @@ function createProductOption(product) {
   const option = document.createElement('option');
   option.value = product.id;
 
-  let discountText = '';
-  if (product.isFlashSale) discountText += ' ⚡SALE';
-  if (product.isRecommended) discountText += ' 💝추천';
+  const discountText =
+    getDiscountIcon(product) +
+    (product.isFlashSale ? 'SALE' : '') +
+    (product.isRecommended ? '추천' : '');
 
   if (product.stockQuantity === 0) {
     option.textContent = `${product.name} - ${product.price}원 (품절)${discountText}`;
     option.disabled = true;
     option.className = 'text-gray-400';
   } else {
-    if (product.isFlashSale && product.isRecommended) {
-      option.textContent = `⚡💝${product.name} - ${product.originalPrice}원 → ${product.price}원 (25% SUPER SALE!)`;
-      option.className = 'text-purple-600 font-bold';
-    } else if (product.isFlashSale) {
-      option.textContent = `⚡${product.name} - ${product.originalPrice}원 → ${product.price}원 (20% SALE!)`;
-      option.className = 'text-red-500 font-bold';
-    } else if (product.isRecommended) {
-      option.textContent = `💝${product.name} - ${product.originalPrice}원 → ${product.price}원 (5% 추천할인!)`;
-      option.className = 'text-blue-500 font-bold';
+    const discountIcon = getDiscountIcon(product);
+    const className = getDiscountClassName(product);
+
+    if (product.isFlashSale || product.isRecommended) {
+      const discountPercent =
+        product.isFlashSale && product.isRecommended
+          ? 25
+          : product.isFlashSale
+            ? 20
+            : 5;
+      const discountLabel =
+        product.isFlashSale && product.isRecommended
+          ? 'SUPER SALE!'
+          : product.isFlashSale
+            ? 'SALE!'
+            : '추천할인!';
+      option.textContent = `${discountIcon}${product.name} - ${product.originalPrice}원 → ${product.price}원 (${discountPercent}% ${discountLabel})`;
+      option.className = className;
     } else {
       option.textContent = `${product.name} - ${product.price}원${discountText}`;
     }
@@ -251,7 +316,10 @@ function createProductOption(product) {
 }
 
 function updateSelectOptions() {
-  const productSelectElement = getProductSelectElement();
+  const productSelectElement = getRequiredElement(
+    getProductSelectElement,
+    'Product select element not found'
+  );
   if (!productSelectElement) return 0;
 
   productSelectElement.innerHTML = '';
@@ -272,7 +340,10 @@ function updateSelectOptions() {
 }
 
 function updateStockInfo() {
-  const stockStatusDisplay = getStockStatusDisplay();
+  const stockStatusDisplay = getRequiredElement(
+    getStockStatusDisplay,
+    'Stock status display not found'
+  );
   if (!stockStatusDisplay) return;
 
   const lowStockItems = getLowStockProducts();
@@ -292,32 +363,27 @@ function updateStockInfo() {
 }
 
 function updatePricesInCart() {
-  const cartItemsContainer = getCartItemsContainer();
+  const cartItemsContainer = getRequiredElement(
+    getCartItemsContainer,
+    'Cart items container not found'
+  );
   if (!cartItemsContainer) return;
 
   const cartItems = cartItemsContainer.children;
 
   for (let i = 0; i < cartItems.length; i++) {
     const itemElement = cartItems[i];
-    const product = findProductById(itemElement.id);
+    const product = getRequiredProduct(
+      itemElement.id,
+      `Product with id ${itemElement.id} not found`
+    );
 
     if (product) {
       const priceDiv = itemElement.querySelector('.text-lg');
       const nameDiv = itemElement.querySelector('h3');
 
-      if (product.isFlashSale && product.isRecommended) {
-        priceDiv.innerHTML = `<span class="line-through text-gray-400">${formatPrice(product.originalPrice)}</span> <span class="text-purple-600">${formatPrice(product.price)}</span>`;
-        nameDiv.textContent = '⚡💝' + product.name;
-      } else if (product.isFlashSale) {
-        priceDiv.innerHTML = `<span class="line-through text-gray-400">${formatPrice(product.originalPrice)}</span> <span class="text-red-500">${formatPrice(product.price)}</span>`;
-        nameDiv.textContent = '⚡' + product.name;
-      } else if (product.isRecommended) {
-        priceDiv.innerHTML = `<span class="line-through text-gray-400">${formatPrice(product.originalPrice)}</span> <span class="text-blue-500">${formatPrice(product.price)}</span>`;
-        nameDiv.textContent = '💝' + product.name;
-      } else {
-        priceDiv.textContent = formatPrice(product.price);
-        nameDiv.textContent = product.name;
-      }
+      priceDiv.innerHTML = getPriceDisplay(product);
+      nameDiv.textContent = getDiscountIcon(product) + product.name;
     }
   }
 
@@ -750,14 +816,26 @@ function createManualOverlay() {
 
 // 이벤트 핸들러 함수들
 function insertProductToCart() {
-  const productSelectElement = getProductSelectElement();
-  const cartItemsContainer = getCartItemsContainer();
-  const cartTotalDisplay = getCartTotalDisplay();
+  const productSelectElement = getRequiredElement(
+    getProductSelectElement,
+    'Product select element not found'
+  );
+  const cartItemsContainer = getRequiredElement(
+    getCartItemsContainer,
+    'Cart items container not found'
+  );
+  const cartTotalDisplay = getRequiredElement(
+    getCartTotalDisplay,
+    'Cart total display not found'
+  );
 
   if (!productSelectElement || !cartItemsContainer || !cartTotalDisplay)
     return null;
 
-  const selectedProduct = findProductById(productSelectElement.value);
+  const selectedProduct = getRequiredProduct(
+    productSelectElement.value,
+    'Selected product not found'
+  );
   if (!selectedProduct || selectedProduct.stockQuantity <= 0) return null;
 
   const existingCartItem = document.getElementById(selectedProduct.id);
@@ -785,7 +863,10 @@ function updateExistingCartItem(cartItem, product) {
 }
 
 function createCartItem(product) {
-  const cartItemsContainer = getCartItemsContainer();
+  const cartItemsContainer = getRequiredElement(
+    getCartItemsContainer,
+    'Cart items container not found'
+  );
   if (!cartItemsContainer) return null;
 
   const cartItemElement = document.createElement('div');
@@ -793,8 +874,7 @@ function createCartItem(product) {
   cartItemElement.className =
     'grid grid-cols-[80px_1fr_auto] gap-5 py-5 border-b border-gray-100 first:pt-0 last:border-b-0 last:pb-0';
 
-  const discountIcon = `${product.isFlashSale ? '⚡' : ''}${product.isRecommended ? '💝' : ''}`;
-
+  const discountIcon = getDiscountIcon(product);
   const priceDisplay = getPriceDisplay(product);
 
   cartItemElement.innerHTML = `
@@ -821,27 +901,12 @@ function createCartItem(product) {
   product.stockQuantity--;
 }
 
-function getPriceDisplay(product) {
-  if (!product.isFlashSale && !product.isRecommended) {
-    return formatPrice(product.price);
-  }
-
-  const priceClass =
-    product.isFlashSale && product.isRecommended
-      ? 'text-purple-600'
-      : product.isFlashSale
-        ? 'text-red-500'
-        : 'text-blue-500';
-
-  return `
-    <span class="line-through text-gray-400">${formatPrice(product.originalPrice)}</span>
-    <span class="${priceClass}">${formatPrice(product.price)}</span>
-  `;
-}
-
 function handleQuantityChange(productId, changeAmount) {
   const itemElement = document.getElementById(productId);
-  const product = findProductById(productId);
+  const product = getRequiredProduct(
+    productId,
+    `Product with id ${productId} not found`
+  );
 
   if (!itemElement || !product) return;
 
@@ -865,7 +930,10 @@ function handleQuantityChange(productId, changeAmount) {
 
 function handleRemoveItem(productId) {
   const itemElement = document.getElementById(productId);
-  const product = findProductById(productId);
+  const product = getRequiredProduct(
+    productId,
+    `Product with id ${productId} not found`
+  );
 
   if (!itemElement || !product) return;
 
@@ -886,7 +954,10 @@ function handleCartItemClick(event) {
   }
 
   const productId = targetElement.dataset.productId;
-  const product = findProductById(productId);
+  const product = getRequiredProduct(
+    productId,
+    `Product with id ${productId} not found`
+  );
 
   if (!product) return;
 
@@ -964,8 +1035,14 @@ function initializeApp() {
 }
 
 function updateCartCalculations() {
-  const cartItemsContainer = getCartItemsContainer();
-  const cartTotalDisplay = getCartTotalDisplay();
+  const cartItemsContainer = getRequiredElement(
+    getCartItemsContainer,
+    'Cart items container not found'
+  );
+  const cartTotalDisplay = getRequiredElement(
+    getCartTotalDisplay,
+    'Cart total display not found'
+  );
   if (!cartItemsContainer || !cartTotalDisplay) return null;
 
   const cartItems = cartItemsContainer.children;
