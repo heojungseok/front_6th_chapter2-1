@@ -3,6 +3,7 @@ import { productList } from './data/productData';
 import { addToCart, removeFromCart, updateCartItemQuantity, calculateCartSummary } from './services/cartService';
 import { Product, CartItem } from './types';
 import { CURRENCY_SYMBOL } from './constants';
+import Header from './components/Header';
 
 const App: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -58,14 +59,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-screen-xl mx-auto p-8">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            🛒 Advanced React + TypeScript
-          </h1>
-          <p className="text-lg text-gray-600">
-            장바구니 시스템 - React + TypeScript 버전
-          </p>
-        </header>
+        <Header />
         
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
           {/* 좌측: 상품 선택 및 장바구니 */}
