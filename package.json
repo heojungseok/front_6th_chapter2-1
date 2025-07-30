@@ -27,9 +27,11 @@
     "clean:advanced": "rm -rf dist/advanced",
     "deploy:dev": "./scripts/deploy.sh dev",
     "deploy:gh-pages": "./scripts/deploy.sh gh-pages",
-    "deploy:prod": "./scripts/deploy.sh prod"
+    "deploy:prod": "./scripts/deploy.sh prod",
+    "deploy:gh-pages-prepare": "./scripts/deploy-gh-pages.sh"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.9",

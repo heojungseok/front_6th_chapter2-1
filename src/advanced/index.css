@@ -1,3 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Custom styles for advanced version */
+body {
+    background-color: rgb(249 250 251);
+    color: rgb(0 0 0);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    overflow: hidden;
+    height: 100vh;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.gradient-black {
+    background-image: linear-gradient(135deg, #000 0%, #333 100%);
+}
