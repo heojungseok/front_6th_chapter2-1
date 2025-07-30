@@ -58,7 +58,8 @@ import {
   ORANGE_COLOR, 
   EMPTY_STRING,
   CSS_CLASSES,
-  ERROR_MESSAGES 
+  ERROR_MESSAGES,
+  CONSOLE_MESSAGES
 } from './constants/ui.js';
 import { 
   DISCOUNT_ICONS, 
@@ -300,12 +301,12 @@ function handleCartItemClick(event) {
   if (product && product.stockQuantity < STOCK_WARNING_THRESHOLD) {
     // 재고 부족 알림 로직 추가 가능
     console.warn(
-      `⚠️ ${product.name}의 재고가 부족합니다. (${product.stockQuantity}개 남음)`
+      CONSOLE_MESSAGES.STOCK_WARNING(product.name, product.stockQuantity)
     );
 
     // 재고가 매우 적을 때 (2개 이하) 사용자에게 알림
     if (product.stockQuantity <= 2) {
-      console.log(`🚨 ${product.name}의 재고가 거의 소진되었습니다!`);
+      console.log(CONSOLE_MESSAGES.STOCK_CRITICAL(product.name));
     }
   }
 
@@ -386,11 +387,11 @@ function calculateCartSummary(cartItems) {
 function updateCartCalculations() {
   const cartItemsContainer = getRequiredElement(
     getCartItemsContainer,
-    'Cart items container not found'
+    ERROR_MESSAGES.CART_ITEMS_NOT_FOUND
   );
   const cartTotalDisplay = getRequiredElement(
     getCartTotalDisplay,
-    'Cart total display not found'
+    ERROR_MESSAGES.CART_TOTAL_NOT_FOUND
   );
   if (!cartItemsContainer || !cartTotalDisplay) return null;
 

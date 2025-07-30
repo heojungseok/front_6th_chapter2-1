@@ -20,4 +20,12 @@ export const ERROR_MESSAGES = {
   CART_ITEMS_NOT_FOUND: 'Cart items container not found',
   CART_TOTAL_NOT_FOUND: 'Cart total display not found',
   SELECTED_PRODUCT_NOT_FOUND: 'Selected product not found'
+};
+
+// 콘솔 메시지
+export const CONSOLE_MESSAGES = {
+  STOCK_WARNING: (productName, stockQuantity) => 
+    `⚠️ ${productName}의 재고가 부족합니다. (${stockQuantity}개 남음)`,
+  STOCK_CRITICAL: (productName) => 
+    `🚨 ${productName}의 재고가 거의 소진되었습니다!`
 }; 
