@@ -1,6 +1,6 @@
 import React from 'react';
 import { Product } from '../types';
-import { CURRENCY_SYMBOL, PRODUCT_CONSTANTS } from '../constants';
+import { CURRENCY_SYMBOL } from '../constants';
 import { useTimer } from '../contexts/TimerContext';
 import { getDiscountType } from '../utils/discountUtils';
 import StockStatus from './StockStatus';
@@ -17,14 +17,17 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
   products,
   selectedProductId,
   onProductSelect,
-  onAddToCart
+  onAddToCart,
 }) => {
   const { timerState, updateLastSelectedProduct } = useTimer();
-  
+
   // 전체 재고 계산
-  const totalStock = products.reduce((sum, product) => sum + product.stockQuantity, 0);
+  const totalStock = products.reduce(
+    (sum, product) => sum + product.stockQuantity,
+    0
+  );
   const isLowTotalStock = totalStock < 50;
-  
+
   // 상품 선택 핸들러
   const handleProductSelect = (productId: string) => {
     onProductSelect(productId);
@@ -32,7 +35,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
   };
 
   // 선택된 상품의 할인 상태 확인
-  const selectedProduct = products.find(p => p.id === selectedProductId);
+  const selectedProduct = products.find((p) => p.id === selectedProductId);
   const discountType = getDiscountType(
     selectedProductId,
     timerState.flashSaleProductId,
@@ -44,20 +47,25 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">상품 선택</h2>
       <div className="space-y-4">
         <div className="relative">
-          <select 
+          <select
             value={selectedProductId}
             onChange={(e) => handleProductSelect(e.target.value)}
             className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
               isLowTotalStock ? 'border-orange-500' : 'border-gray-300'
             }`}
           >
-            {products.map(product => (
-              <option key={product.id} value={product.id} disabled={product.stockQuantity === 0}>
-                {product.name} - {CURRENCY_SYMBOL}{product.price.toLocaleString()}
+            {products.map((product) => (
+              <option
+                key={product.id}
+                value={product.id}
+                disabled={product.stockQuantity === 0}
+              >
+                {product.name} - {CURRENCY_SYMBOL}
+                {product.price.toLocaleString()}
               </option>
             ))}
           </select>
-          
+
           {/* 할인 아이콘 표시 */}
           {discountType && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -65,23 +73,26 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* 선택된 상품 정보 */}
         {selectedProduct && (
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="font-semibold text-gray-800">{selectedProduct.name}</h3>
+              <h3 className="font-semibold text-gray-800">
+                {selectedProduct.name}
+              </h3>
               {discountType && <DiscountIcon discountType={discountType} />}
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">
-                {CURRENCY_SYMBOL}{selectedProduct.price.toLocaleString()}
+                {CURRENCY_SYMBOL}
+                {selectedProduct.price.toLocaleString()}
               </span>
               <StockStatus product={selectedProduct} />
             </div>
           </div>
         )}
-        
+
         <button
           onClick={onAddToCart}
           disabled={selectedProduct?.stockQuantity === 0}
@@ -98,4 +109,4 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
   );
 };
 
-export default ProductSelector; 
+export default ProductSelector;

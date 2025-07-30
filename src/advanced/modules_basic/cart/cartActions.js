@@ -65,36 +65,36 @@ export function resetCart() {
 // 액션 디스패처 (React의 dispatch와 유사)
 export function dispatchCartAction(action) {
   switch (action.type) {
-  case CART_ACTIONS.ADD_ITEM:
-    handleAddItem(action.payload.productId);
-    break;
-  case CART_ACTIONS.REMOVE_ITEM:
-    handleRemoveItem(action.payload.productId);
-    break;
-  case CART_ACTIONS.UPDATE_QUANTITY:
-    handleUpdateQuantity(
-      action.payload.productId,
-      action.payload.changeAmount
-    );
-    break;
-  case CART_ACTIONS.UPDATE_TOTAL:
-    updateState({ totalAmount: action.payload.totalAmount });
-    break;
-  case CART_ACTIONS.UPDATE_ITEM_COUNT:
-    updateState({ itemCount: action.payload.itemCount });
-    break;
-  case CART_ACTIONS.SET_LAST_SELECTED:
-    updateState({ lastSelectedProductId: action.payload.productId });
-    break;
-  case CART_ACTIONS.RESET_CART:
-    updateState({
-      itemCount: 0,
-      totalAmount: 0,
-      lastSelectedProductId: null,
-    });
-    break;
-  default:
-    console.warn('Unknown cart action:', action.type);
+    case CART_ACTIONS.ADD_ITEM:
+      handleAddItem(action.payload.productId);
+      break;
+    case CART_ACTIONS.REMOVE_ITEM:
+      handleRemoveItem(action.payload.productId);
+      break;
+    case CART_ACTIONS.UPDATE_QUANTITY:
+      handleUpdateQuantity(
+        action.payload.productId,
+        action.payload.changeAmount
+      );
+      break;
+    case CART_ACTIONS.UPDATE_TOTAL:
+      updateState({ totalAmount: action.payload.totalAmount });
+      break;
+    case CART_ACTIONS.UPDATE_ITEM_COUNT:
+      updateState({ itemCount: action.payload.itemCount });
+      break;
+    case CART_ACTIONS.SET_LAST_SELECTED:
+      updateState({ lastSelectedProductId: action.payload.productId });
+      break;
+    case CART_ACTIONS.RESET_CART:
+      updateState({
+        itemCount: 0,
+        totalAmount: 0,
+        lastSelectedProductId: null,
+      });
+      break;
+    default:
+      console.warn('Unknown cart action:', action.type);
   }
 }
 

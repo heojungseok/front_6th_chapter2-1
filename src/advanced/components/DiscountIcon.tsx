@@ -2,42 +2,50 @@ import React from 'react';
 import { DISCOUNT_ICONS, CSS_CLASSES } from '../constants';
 
 interface DiscountIconProps {
-  discountType: 'flash_sale' | 'recommendation' | 'super_sale' | 'bulk' | 'tuesday';
+  discountType:
+    | 'flash_sale'
+    | 'recommendation'
+    | 'super_sale'
+    | 'bulk'
+    | 'tuesday';
   className?: string;
 }
 
-const DiscountIcon: React.FC<DiscountIconProps> = ({ discountType, className = '' }) => {
+const DiscountIcon: React.FC<DiscountIconProps> = ({
+  discountType,
+  className = '',
+}) => {
   const getIconAndClass = () => {
     switch (discountType) {
       case 'flash_sale':
         return {
           icon: DISCOUNT_ICONS.FLASH_SALE,
-          className: CSS_CLASSES.RED_BOLD
+          className: CSS_CLASSES.RED_BOLD,
         };
       case 'recommendation':
         return {
           icon: DISCOUNT_ICONS.RECOMMENDATION,
-          className: CSS_CLASSES.BLUE_BOLD
+          className: CSS_CLASSES.BLUE_BOLD,
         };
       case 'super_sale':
         return {
           icon: DISCOUNT_ICONS.SUPER_SALE,
-          className: CSS_CLASSES.PURPLE_BOLD
+          className: CSS_CLASSES.PURPLE_BOLD,
         };
       case 'bulk':
         return {
           icon: '📦',
-          className: 'text-green-600 font-bold'
+          className: 'text-green-600 font-bold',
         };
       case 'tuesday':
         return {
           icon: '🗓️',
-          className: 'text-orange-600 font-bold'
+          className: 'text-orange-600 font-bold',
         };
       default:
         return {
           icon: '',
-          className: ''
+          className: '',
         };
     }
   };
@@ -47,7 +55,10 @@ const DiscountIcon: React.FC<DiscountIconProps> = ({ discountType, className = '
   if (!icon) return null;
 
   return (
-    <span className={`${iconClassName} ${className}`} title={getDiscountTitle(discountType)}>
+    <span
+      className={`${iconClassName} ${className}`}
+      title={getDiscountTitle(discountType)}
+    >
       {icon}
     </span>
   );
@@ -71,4 +82,4 @@ const getDiscountTitle = (discountType: string): string => {
   }
 };
 
-export default DiscountIcon; 
+export default DiscountIcon;

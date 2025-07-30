@@ -52,19 +52,19 @@ import {
 } from './modules_basic/ui/uiRenderer.js';
 
 // 상수 import
-import { 
-  CURRENCY_SYMBOL, 
-  SOLD_OUT_TEXT, 
-  ORANGE_COLOR, 
+import {
+  CURRENCY_SYMBOL,
+  SOLD_OUT_TEXT,
+  ORANGE_COLOR,
   EMPTY_STRING,
   CSS_CLASSES,
-  ERROR_MESSAGES 
+  ERROR_MESSAGES,
 } from './constants_basic/ui.js';
-import { 
-  DISCOUNT_ICONS, 
-  DISCOUNT_LABELS, 
-  DISCOUNT_TEXTS, 
-  DISCOUNT_PERCENTAGES 
+import {
+  DISCOUNT_ICONS,
+  DISCOUNT_LABELS,
+  DISCOUNT_TEXTS,
+  DISCOUNT_PERCENTAGES,
 } from './constants_basic/discount.js';
 
 // 중복 코드 제거를 위한 헬퍼 함수들
@@ -80,7 +80,10 @@ function getRequiredElement(
   return element;
 }
 
-function getRequiredProduct(productId, errorMessage = ERROR_MESSAGES.PRODUCT_NOT_FOUND) {
+function getRequiredProduct(
+  productId,
+  errorMessage = ERROR_MESSAGES.PRODUCT_NOT_FOUND
+) {
   const product = findProductById(productId);
   if (!product) {
     console.warn(errorMessage);
@@ -379,7 +382,7 @@ function calculateCartSummary(cartItems) {
     subtotal,
     totalQuantity,
     discountData,
-    loyaltyPoints
+    loyaltyPoints,
   };
 }
 
@@ -398,8 +401,13 @@ function updateCartCalculations() {
 
   // 계산 로직을 별도 함수로 분리
   const summary = calculateCartSummary(cartItems);
-  const { items, subtotal, totalQuantity, discountData, loyaltyPoints } = summary;
-  const { totalAmount: calculatedTotalAmount, itemDiscounts, discountRate } = discountData;
+  const { items, subtotal, totalQuantity, discountData, loyaltyPoints } =
+    summary;
+  const {
+    totalAmount: calculatedTotalAmount,
+    itemDiscounts,
+    discountRate,
+  } = discountData;
   const { finalPoints, pointsDetail } = loyaltyPoints;
 
   // Update global state
@@ -457,7 +465,7 @@ function main() {
 function setupEventListeners() {
   // 장바구니 아이템 이벤트 위임
   getCartItemsContainer().addEventListener('click', handleCartItemClick);
-  
+
   // 상품 추가 버튼
   const addToCartBtn = document.getElementById('add-to-cart');
   if (addToCartBtn) {

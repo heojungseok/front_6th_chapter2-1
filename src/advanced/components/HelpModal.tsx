@@ -25,7 +25,9 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         <div className="space-y-6">
           {/* 할인 정책 */}
           <section>
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">할인 정책</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">
+              할인 정책
+            </h3>
             <div className="space-y-3 text-gray-600">
               <div className="flex items-start">
                 <span className="font-medium w-32">개별 상품 할인:</span>
@@ -56,7 +58,9 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
           {/* 포인트 적립 */}
           <section>
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">포인트 적립</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">
+              포인트 적립
+            </h3>
             <div className="space-y-3 text-gray-600">
               <div className="flex items-start">
                 <span className="font-medium w-32">기본 적립:</span>
@@ -79,7 +83,9 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
           {/* 재고 관리 */}
           <section>
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">재고 관리</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">
+              재고 관리
+            </h3>
             <div className="space-y-3 text-gray-600">
               <div className="flex items-start">
                 <span className="font-medium w-32">재고 부족:</span>
@@ -133,4 +139,4 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default HelpModal; 
+export default HelpModal;

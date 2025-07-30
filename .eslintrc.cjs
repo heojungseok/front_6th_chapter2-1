@@ -9,6 +9,14 @@ module.exports = {
       // React + TypeScript 파일용 설정
       files: ['src/**/*.{ts,tsx}'],
       parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: './tsconfig.json',
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
       plugins: ['react', '@typescript-eslint', 'prettier'],
       extends: [
         'eslint:recommended',
@@ -21,6 +29,20 @@ module.exports = {
       ],
       rules: {
         'prettier/prettier': 'error',
+        '@typescript-eslint/no-unused-vars': 'warn',
+        '@typescript-eslint/no-explicit-any': 'warn',
+        'react/function-component-definition': 'off',
+        'react/require-default-props': 'off',
+        'react/button-has-type': 'off',
+        'react/no-unescaped-entities': 'off',
+        'react/no-array-index-key': 'warn',
+        'react/jsx-no-constructed-context-values': 'warn',
+        'no-alert': 'off',
+        'no-console': 'off',
+        'default-case': 'off',
+        'import/prefer-default-export': 'off',
+        '@typescript-eslint/no-use-before-define': 'off',
+        '@typescript-eslint/no-shadow': 'off',
       },
       settings: {
         react: {

@@ -13,10 +13,10 @@ interface CartContainerProps {
 const CartContainer: React.FC<CartContainerProps> = ({
   cartItems,
   onQuantityChange,
-  onRemoveItem
+  onRemoveItem,
 }) => {
   const { timerState } = useTimer();
-  
+
   // 할인 타입 확인 함수
   const getItemDiscountType = (productId: string) => {
     return getDiscountType(
@@ -32,7 +32,9 @@ const CartContainer: React.FC<CartContainerProps> = ({
         장바구니 ({cartItems.length}개 상품)
       </h2>
       {cartItems.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">장바구니가 비어있습니다.</p>
+        <p className="text-gray-500 text-center py-8">
+          장바구니가 비어있습니다.
+        </p>
       ) : (
         <div className="space-y-4">
           {cartItems.map((item) => (
@@ -50,4 +52,4 @@ const CartContainer: React.FC<CartContainerProps> = ({
   );
 };
 
-export default CartContainer; 
+export default CartContainer;

@@ -4,13 +4,13 @@ import { DISCOUNT_PERCENTAGES, PRODUCT_CONSTANTS } from '../constants';
 // 개별 상품 할인 계산
 export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
   const { product, quantity } = item;
-  
+
   if (quantity < 10) {
     return {
       productId: product.id,
       discountAmount: 0,
       discountRate: 0,
-      discountType: 'flash_sale'
+      discountType: 'flash_sale',
     };
   }
 
@@ -42,24 +42,24 @@ export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
     productId: product.id,
     discountAmount,
     discountRate,
-    discountType: 'flash_sale'
+    discountType: 'flash_sale',
   };
 };
 
 // 전체 수량 할인 계산
 export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   if (totalQuantity < PRODUCT_CONSTANTS.BULK_DISCOUNT_THRESHOLD) {
     return [];
   }
 
   // 전체 수량 할인이 개별 할인보다 우선
-  return items.map(item => ({
+  return items.map((item) => ({
     productId: item.product.id,
     discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.BULK / 100),
     discountRate: DISCOUNT_PERCENTAGES.BULK / 100,
-    discountType: 'bulk'
+    discountType: 'bulk',
   }));
 };
 
@@ -67,50 +67,51 @@ export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
 export const calculateTuesdayDiscount = (items: CartItem[]): ItemDiscount[] => {
   const today = new Date();
   const isTuesday = today.getDay() === 2; // 0=일요일, 2=화요일
-  
+
   if (!isTuesday) {
     return [];
   }
 
-  return items.map(item => ({
+  return items.map((item) => ({
     productId: item.product.id,
     discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.TUESDAY / 100),
     discountRate: DISCOUNT_PERCENTAGES.TUESDAY / 100,
-    discountType: 'tuesday'
+    discountType: 'tuesday',
   }));
 };
 
 // 번개세일 할인 계산
 export const calculateFlashSaleDiscount = (
-  items: CartItem[], 
+  items: CartItem[],
   flashSaleProductId: string | null
 ): ItemDiscount[] => {
   if (!flashSaleProductId) return [];
 
   return items
-    .filter(item => item.product.id === flashSaleProductId)
-    .map(item => ({
+    .filter((item) => item.product.id === flashSaleProductId)
+    .map((item) => ({
       productId: item.product.id,
       discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.FLASH_SALE / 100),
       discountRate: DISCOUNT_PERCENTAGES.FLASH_SALE / 100,
-      discountType: 'flash_sale'
+      discountType: 'flash_sale',
     }));
 };
 
 // 추천할인 계산
 export const calculateRecommendationDiscount = (
-  items: CartItem[], 
+  items: CartItem[],
   recommendationProductId: string | null
 ): ItemDiscount[] => {
   if (!recommendationProductId) return [];
 
   return items
-    .filter(item => item.product.id === recommendationProductId)
-    .map(item => ({
+    .filter((item) => item.product.id === recommendationProductId)
+    .map((item) => ({
       productId: item.product.id,
-      discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.RECOMMENDATION / 100),
+      discountAmount:
+        item.itemTotal * (DISCOUNT_PERCENTAGES.RECOMMENDATION / 100),
       discountRate: DISCOUNT_PERCENTAGES.RECOMMENDATION / 100,
-      discountType: 'recommendation'
+      discountType: 'recommendation',
     }));
 };
 
@@ -125,12 +126,13 @@ export const calculateSuperSaleDiscount = (
   // 번개세일과 추천할인이 같은 상품에 적용되는 경우
   if (flashSaleProductId === recommendationProductId) {
     return items
-      .filter(item => item.product.id === flashSaleProductId)
-      .map(item => ({
+      .filter((item) => item.product.id === flashSaleProductId)
+      .map((item) => ({
         productId: item.product.id,
-        discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.SUPER_SALE / 100),
+        discountAmount:
+          item.itemTotal * (DISCOUNT_PERCENTAGES.SUPER_SALE / 100),
         discountRate: DISCOUNT_PERCENTAGES.SUPER_SALE / 100,
-        discountType: 'super_sale'
+        discountType: 'super_sale',
       }));
   }
 
@@ -138,12 +140,14 @@ export const calculateSuperSaleDiscount = (
 };
 
 // 할인 중복 처리 (최대 할인율 적용)
-export const mergeDiscounts = (allDiscounts: ItemDiscount[][]): ItemDiscount[] => {
+export const mergeDiscounts = (
+  allDiscounts: ItemDiscount[][]
+): ItemDiscount[] => {
   const discountMap = new Map<string, ItemDiscount>();
 
-  allDiscounts.flat().forEach(discount => {
+  allDiscounts.flat().forEach((discount) => {
     const existing = discountMap.get(discount.productId);
-    
+
     if (!existing || discount.discountRate > existing.discountRate) {
       discountMap.set(discount.productId, discount);
     }
@@ -162,7 +166,7 @@ export const calculateDiscounts = (
     return {
       totalAmount: 0,
       itemDiscounts: [],
-      discountRate: 0
+      discountRate: 0,
     };
   }
 
@@ -172,9 +176,19 @@ export const calculateDiscounts = (
   const individualDiscounts = items.map(calculateIndividualDiscount);
   const bulkDiscounts = calculateBulkDiscount(items);
   const tuesdayDiscounts = calculateTuesdayDiscount(items);
-  const flashSaleDiscounts = calculateFlashSaleDiscount(items, flashSaleProductId);
-  const recommendationDiscounts = calculateRecommendationDiscount(items, recommendationProductId);
-  const superSaleDiscounts = calculateSuperSaleDiscount(items, flashSaleProductId, recommendationProductId);
+  const flashSaleDiscounts = calculateFlashSaleDiscount(
+    items,
+    flashSaleProductId
+  );
+  const recommendationDiscounts = calculateRecommendationDiscount(
+    items,
+    recommendationProductId
+  );
+  const superSaleDiscounts = calculateSuperSaleDiscount(
+    items,
+    flashSaleProductId,
+    recommendationProductId
+  );
 
   // 할인 중복 처리
   const allDiscounts = [
@@ -183,17 +197,21 @@ export const calculateDiscounts = (
     tuesdayDiscounts,
     flashSaleDiscounts,
     recommendationDiscounts,
-    superSaleDiscounts
+    superSaleDiscounts,
   ];
 
   const finalDiscounts = mergeDiscounts(allDiscounts);
-  const totalDiscountAmount = finalDiscounts.reduce((sum, discount) => sum + discount.discountAmount, 0);
+  const totalDiscountAmount = finalDiscounts.reduce(
+    (sum, discount) => sum + discount.discountAmount,
+    0
+  );
   const totalAmount = subtotal - totalDiscountAmount;
-  const discountRate = subtotal > 0 ? (totalDiscountAmount / subtotal) * 100 : 0;
+  const discountRate =
+    subtotal > 0 ? (totalDiscountAmount / subtotal) * 100 : 0;
 
   return {
     totalAmount,
     itemDiscounts: finalDiscounts,
-    discountRate
+    discountRate,
   };
-}; 
+};

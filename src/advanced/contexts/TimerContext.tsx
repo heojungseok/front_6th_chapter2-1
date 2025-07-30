@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  ReactNode,
+} from 'react';
 import { TimerState, timerService } from '../services/timerService';
 import { productList } from '../data/productData';
 
@@ -23,7 +31,7 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
     isRecommendationActive: false,
     flashSaleProductId: null,
     recommendationProductId: null,
-    lastSelectedProductId: null
+    lastSelectedProductId: null,
   });
 
   // 타이머 서비스 초기화
@@ -31,14 +39,18 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
     const handleFlashSaleChange = (productId: string) => {
       if (productId) {
         // 번개세일 시작 알림
-        alert(`⚡ 번개세일! ${productList.find(p => p.id === productId)?.name} 상품이 20% 할인됩니다!`);
+        alert(
+          `⚡ 번개세일! ${productList.find((p) => p.id === productId)?.name} 상품이 20% 할인됩니다!`
+        );
       }
     };
 
     const handleRecommendationChange = (productId: string) => {
       if (productId) {
         // 추천할인 시작 알림
-        alert(`💝 추천할인! ${productList.find(p => p.id === productId)?.name} 상품이 5% 할인됩니다!`);
+        alert(
+          `💝 추천할인! ${productList.find((p) => p.id === productId)?.name} 상품이 5% 할인됩니다!`
+        );
       }
     };
 
@@ -61,19 +73,20 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
   }, []);
 
   // 마지막 선택 상품 업데이트
-  const updateLastSelectedProduct = (productId: string) => {
+  const updateLastSelectedProduct = useCallback((productId: string) => {
     timerService.updateLastSelectedProduct(productId);
-  };
+  }, []);
 
-  const value: TimerContextType = {
-    timerState,
-    updateLastSelectedProduct
-  };
+  const value: TimerContextType = useMemo(
+    () => ({
+      timerState,
+      updateLastSelectedProduct,
+    }),
+    [timerState, updateLastSelectedProduct]
+  );
 
   return (
-    <TimerContext.Provider value={value}>
-      {children}
-    </TimerContext.Provider>
+    <TimerContext.Provider value={value}>{children}</TimerContext.Provider>
   );
 };
 
@@ -84,4 +97,4 @@ export const useTimer = (): TimerContextType => {
     throw new Error('useTimer must be used within a TimerProvider');
   }
   return context;
-}; 
+};

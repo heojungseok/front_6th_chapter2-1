@@ -10,7 +10,7 @@ export const productList: Product[] = [
     stockQuantity: 10,
     isFlashSale: false,
     isRecommended: false,
-    category: 'keyboard'
+    category: 'keyboard',
   },
   {
     id: 'product2',
@@ -19,7 +19,7 @@ export const productList: Product[] = [
     stockQuantity: 15,
     isFlashSale: false,
     isRecommended: false,
-    category: 'mouse'
+    category: 'mouse',
   },
   {
     id: 'product3',
@@ -28,7 +28,7 @@ export const productList: Product[] = [
     stockQuantity: 8,
     isFlashSale: false,
     isRecommended: false,
-    category: 'monitor'
+    category: 'monitor',
   },
   {
     id: 'product4',
@@ -37,7 +37,7 @@ export const productList: Product[] = [
     stockQuantity: 0,
     isFlashSale: false,
     isRecommended: false,
-    category: 'accessory'
+    category: 'accessory',
   },
   {
     id: 'product5',
@@ -46,42 +46,47 @@ export const productList: Product[] = [
     stockQuantity: 3,
     isFlashSale: false,
     isRecommended: false,
-    category: 'audio'
-  }
+    category: 'audio',
+  },
 ];
 
 // 상품 검색 함수
 export const findProductById = (id: string): Product | undefined => {
-  return productList.find(product => product.id === id);
+  return productList.find((product) => product.id === id);
 };
 
 // 전체 재고 계산 함수
 export const getTotalStock = (): number => {
-  return productList.reduce((total, product) => total + product.stockQuantity, 0);
+  return productList.reduce(
+    (total, product) => total + product.stockQuantity,
+    0
+  );
 };
 
 // 재고 부족 상품 조회 함수
 export const getLowStockProducts = (): Product[] => {
-  return productList.filter(product => 
-    product.stockQuantity > 0 && 
-    product.stockQuantity <= PRODUCT_CONSTANTS.STOCK_WARNING_THRESHOLD
+  return productList.filter(
+    (product) =>
+      product.stockQuantity > 0 &&
+      product.stockQuantity <= PRODUCT_CONSTANTS.STOCK_WARNING_THRESHOLD
   );
 };
 
 // 품절 상품 조회 함수
 export const getOutOfStockProducts = (): Product[] => {
-  return productList.filter(product => product.stockQuantity === 0);
+  return productList.filter((product) => product.stockQuantity === 0);
 };
 
 // 재고 상태 표시 함수
 export const getStockStatusDisplay = (product: Product): string => {
   if (product.stockQuantity === 0) {
     return '품절';
-  } else if (product.stockQuantity <= PRODUCT_CONSTANTS.LOW_STOCK_THRESHOLD) {
-    return `재고 부족 (${product.stockQuantity}개)`;
-  } else if (product.stockQuantity <= PRODUCT_CONSTANTS.STOCK_WARNING_THRESHOLD) {
-    return `재고 적음 (${product.stockQuantity}개)`;
-  } else {
-    return `재고 있음 (${product.stockQuantity}개)`;
   }
-}; 
+  if (product.stockQuantity <= PRODUCT_CONSTANTS.LOW_STOCK_THRESHOLD) {
+    return `재고 부족 (${product.stockQuantity}개)`;
+  }
+  if (product.stockQuantity <= PRODUCT_CONSTANTS.STOCK_WARNING_THRESHOLD) {
+    return `재고 적음 (${product.stockQuantity}개)`;
+  }
+  return `재고 있음 (${product.stockQuantity}개)`;
+};

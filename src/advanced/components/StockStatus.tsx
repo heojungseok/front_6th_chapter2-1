@@ -7,35 +7,39 @@ interface StockStatusProps {
   className?: string;
 }
 
-const StockStatus: React.FC<StockStatusProps> = ({ product, className = '' }) => {
+const StockStatus: React.FC<StockStatusProps> = ({
+  product,
+  className = '',
+}) => {
   const getStockStatus = () => {
     const { stockQuantity } = product;
-    
+
     if (stockQuantity === 0) {
       return {
         text: '품절',
         className: 'text-red-600 font-semibold',
-        icon: '❌'
+        icon: '❌',
       };
-    } else if (stockQuantity <= PRODUCT_CONSTANTS.LOW_STOCK_THRESHOLD) {
+    }
+    if (stockQuantity <= PRODUCT_CONSTANTS.LOW_STOCK_THRESHOLD) {
       return {
         text: `재고 부족 (${stockQuantity}개)`,
         className: 'text-orange-600 font-semibold',
-        icon: '⚠️'
+        icon: '⚠️',
       };
-    } else if (stockQuantity <= PRODUCT_CONSTANTS.STOCK_WARNING_THRESHOLD) {
+    }
+    if (stockQuantity <= PRODUCT_CONSTANTS.STOCK_WARNING_THRESHOLD) {
       return {
         text: `재고 적음 (${stockQuantity}개)`,
         className: 'text-yellow-600 font-semibold',
-        icon: '⚠️'
-      };
-    } else {
-      return {
-        text: `재고 있음 (${stockQuantity}개)`,
-        className: 'text-green-600 font-semibold',
-        icon: '✅'
+        icon: '⚠️',
       };
     }
+    return {
+      text: `재고 있음 (${stockQuantity}개)`,
+      className: 'text-green-600 font-semibold',
+      icon: '✅',
+    };
   };
 
   const { text, className: statusClassName, icon } = getStockStatus();
@@ -48,4 +52,4 @@ const StockStatus: React.FC<StockStatusProps> = ({ product, className = '' }) =>
   );
 };
 
-export default StockStatus; 
+export default StockStatus;

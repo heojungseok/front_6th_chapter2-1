@@ -35,7 +35,12 @@ export interface ItemDiscount {
   productId: string;
   discountAmount: number;
   discountRate: number;
-  discountType: 'flash_sale' | 'recommendation' | 'bulk' | 'tuesday' | 'super_sale';
+  discountType:
+    | 'flash_sale'
+    | 'recommendation'
+    | 'bulk'
+    | 'tuesday'
+    | 'super_sale';
 }
 
 // 포인트 관련 타입
@@ -59,6 +64,9 @@ export interface UIState {
 }
 
 // 이벤트 핸들러 타입
-export type QuantityChangeHandler = (productId: string, changeAmount: number) => void;
+export type QuantityChangeHandler = (
+  productId: string,
+  changeAmount: number
+) => void;
 export type RemoveItemHandler = (productId: string) => void;
-export type ProductSelectHandler = (productId: string) => void; 
+export type ProductSelectHandler = (productId: string) => void;

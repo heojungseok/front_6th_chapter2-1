@@ -7,14 +7,20 @@ interface CartItemProps {
   item: CartItemType;
   onQuantityChange: (productId: string, change: number) => void;
   onRemoveItem: (productId: string) => void;
-  discountType?: 'flash_sale' | 'recommendation' | 'super_sale' | 'bulk' | 'tuesday' | null;
+  discountType?:
+    | 'flash_sale'
+    | 'recommendation'
+    | 'super_sale'
+    | 'bulk'
+    | 'tuesday'
+    | null;
 }
 
 const CartItem: React.FC<CartItemProps> = ({
   item,
   onQuantityChange,
   onRemoveItem,
-  discountType
+  discountType,
 }) => {
   const handleDecreaseQuantity = () => {
     onQuantityChange(item.product.id, -1);
@@ -33,18 +39,28 @@ const CartItem: React.FC<CartItemProps> = ({
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
-            <h3 className={`font-semibold ${discountType ? 'font-bold' : 'text-gray-800'}`}>
+            <h3
+              className={`font-semibold ${discountType ? 'font-bold' : 'text-gray-800'}`}
+            >
               {item.product.name}
             </h3>
             {discountType && <DiscountIcon discountType={discountType} />}
           </div>
           <div className="flex items-center space-x-2 text-sm">
-            <span className={discountType ? CSS_CLASSES.LINE_THROUGH : 'text-gray-600'}>
-              {CURRENCY_SYMBOL}{item.product.price.toLocaleString()}
+            <span
+              className={
+                discountType ? CSS_CLASSES.LINE_THROUGH : 'text-gray-600'
+              }
+            >
+              {CURRENCY_SYMBOL}
+              {item.product.price.toLocaleString()}
             </span>
             {discountType && (
               <span className="text-green-600 font-semibold">
-                {CURRENCY_SYMBOL}{Math.round(item.product.price * (1 - getDiscountRate(discountType))).toLocaleString()}
+                {CURRENCY_SYMBOL}
+                {Math.round(
+                  item.product.price * (1 - getDiscountRate(discountType))
+                ).toLocaleString()}
               </span>
             )}
             <span className="text-gray-500">× {item.quantity}</span>
@@ -77,7 +93,8 @@ const CartItem: React.FC<CartItemProps> = ({
       </div>
       <div className="mt-2 text-right">
         <span className="font-semibold text-gray-800">
-          {CURRENCY_SYMBOL}{item.itemTotal.toLocaleString()}
+          {CURRENCY_SYMBOL}
+          {item.itemTotal.toLocaleString()}
         </span>
       </div>
     </div>
@@ -102,4 +119,4 @@ const getDiscountRate = (discountType: string): number => {
   }
 };
 
-export default CartItem; 
+export default CartItem;
