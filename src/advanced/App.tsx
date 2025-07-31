@@ -80,7 +80,6 @@ const AppContent: React.FC = () => {
   );
 };
 
-// 메인 App 컴포넌트 (Provider들로 감싸기)
 const App: React.FC = () => {
   return (
     <ToastProvider>

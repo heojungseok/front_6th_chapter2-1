@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// React 앱을 DOM에 마운트
 ReactDOM.createRoot(document.getElementById('app')!).render(
   <React.StrictMode>
     <App />

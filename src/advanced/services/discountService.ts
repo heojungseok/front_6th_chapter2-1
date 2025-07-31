@@ -6,7 +6,6 @@ import {
   DAYS_OF_WEEK,
 } from '../constants/businessRules';
 
-// 개별 상품 할인 계산
 export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
   const { product, quantity } = item;
 
@@ -33,7 +32,6 @@ export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
   };
 };
 
-// 전체 수량 할인 계산
 export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -50,7 +48,6 @@ export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
   }));
 };
 
-// 화요일 할인 계산
 export const calculateTuesdayDiscount = (items: CartItem[]): ItemDiscount[] => {
   const today = new Date();
   const isTuesday = today.getDay() === DAYS_OF_WEEK.TUESDAY;
@@ -67,7 +64,6 @@ export const calculateTuesdayDiscount = (items: CartItem[]): ItemDiscount[] => {
   }));
 };
 
-// 번개세일 할인 계산
 export const calculateFlashSaleDiscount = (
   items: CartItem[],
   flashSaleProductId: string | null
@@ -84,7 +80,6 @@ export const calculateFlashSaleDiscount = (
     }));
 };
 
-// 추천할인 계산
 export const calculateRecommendationDiscount = (
   items: CartItem[],
   recommendationProductId: string | null
@@ -102,7 +97,6 @@ export const calculateRecommendationDiscount = (
     }));
 };
 
-// SUPER SALE 할인 계산 (번개세일 + 추천할인 동시 적용)
 export const calculateSuperSaleDiscount = (
   items: CartItem[],
   flashSaleProductId: string | null,
@@ -126,7 +120,6 @@ export const calculateSuperSaleDiscount = (
   return [];
 };
 
-// 할인 중복 처리 (최대 할인율 적용)
 export const mergeDiscounts = (
   allDiscounts: ItemDiscount[][]
 ): ItemDiscount[] => {
@@ -143,7 +136,6 @@ export const mergeDiscounts = (
   return Array.from(discountMap.values());
 };
 
-// 전체 할인 계산
 export const calculateDiscounts = (
   items: CartItem[],
   flashSaleProductId: string | null = null,

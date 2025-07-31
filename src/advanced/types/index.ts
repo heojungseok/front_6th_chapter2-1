@@ -1,4 +1,4 @@
-// Product 관련 타입
+// Product
 export interface Product {
   id: string;
   name: string;
@@ -9,7 +9,7 @@ export interface Product {
   category: string;
 }
 
-// Cart 관련 타입
+// Cart
 export interface CartItem {
   product: Product;
   quantity: number;
@@ -24,7 +24,7 @@ export interface CartSummary {
   loyaltyPoints: LoyaltyPoints;
 }
 
-// 할인 관련 타입
+// Discount
 export interface DiscountData {
   totalAmount: number;
   itemDiscounts: ItemDiscount[];
@@ -43,7 +43,7 @@ export interface ItemDiscount {
     | 'super_sale';
 }
 
-// 포인트 관련 타입
+// Loyalty Points
 export interface LoyaltyPoints {
   finalPoints: number;
   pointsDetail: {
@@ -53,7 +53,7 @@ export interface LoyaltyPoints {
   };
 }
 
-// UI 상태 타입
+// UI State
 export interface UIState {
   selectedProductId: string | null;
   isManualMode: boolean;
@@ -63,7 +63,7 @@ export interface UIState {
   cartTotalDisplay: HTMLElement | null;
 }
 
-// 이벤트 핸들러 타입
+// Event Handlers
 export type QuantityChangeHandler = (
   productId: string,
   changeAmount: number
