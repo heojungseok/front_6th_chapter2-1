@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { productList } from './data/productData';
-import {
-  addToCart,
-  removeFromCart,
-  updateCartItemQuantity,
-} from './services/cartService';
-import { CartItem } from './types';
 import { TimerProvider } from './contexts/TimerContext';
 import { ToastProvider } from './contexts/ToastContext';
-import { useErrorHandler } from './hooks/useErrorHandler';
+import { useCart } from './hooks/useCart';
+import { useProductSelection } from './hooks/useProductSelection';
+import { useModal } from './hooks/useModal';
 import Header from './components/Header';
 import ProductSelector from './components/ProductSelector';
 import CartContainer from './components/CartContainer';
@@ -17,64 +13,14 @@ import HelpModal from './components/HelpModal';
 import ToastContainer from './components/Toast/ToastContainer';
 
 const AppContent: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [selectedProductId, setSelectedProductId] =
-    useState<string>('product1');
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
-  const { showStockError, showProductNotFoundError } = useErrorHandler();
-
-  // 상품 선택 핸들러
-  const handleProductSelect = (productId: string) => {
-    setSelectedProductId(productId);
-  };
-
-  // 장바구니에 상품 추가
-  const handleAddToCart = () => {
-    const selectedProduct = productList.find((p) => p.id === selectedProductId);
-    if (!selectedProduct) {
-      showProductNotFoundError(selectedProductId);
-      return;
-    }
-
-    // 재고 확인
-    const currentQuantity =
-      cartItems.find((item) => item.product.id === selectedProductId)
-        ?.quantity || 0;
-    if (selectedProduct.stockQuantity <= currentQuantity) {
-      showStockError(selectedProduct.name);
-      return;
-    }
-
-    const updatedCart = addToCart(cartItems, selectedProduct, 1);
-    setCartItems(updatedCart);
-  };
-
-  // 수량 변경
-  const handleQuantityChange = (productId: string, change: number) => {
-    const item = cartItems.find((item) => item.product.id === productId);
-    if (!item) return;
-
-    const newQuantity = item.quantity + change;
-    if (newQuantity <= 0) {
-      // 상품 제거
-      const updatedCart = removeFromCart(cartItems, productId);
-      setCartItems(updatedCart);
-    } else {
-      // 수량 변경
-      const updatedCart = updateCartItemQuantity(
-        cartItems,
-        productId,
-        newQuantity
-      );
-      setCartItems(updatedCart);
-    }
-  };
-
-  // 상품 제거
-  const handleRemoveItem = (productId: string) => {
-    const updatedCart = removeFromCart(cartItems, productId);
-    setCartItems(updatedCart);
-  };
+  const { cartItems, addProductById, removeItemFromCart, updateItemQuantity } =
+    useCart();
+  const { selectedProductId, selectProduct } = useProductSelection();
+  const {
+    isOpen: isHelpModalOpen,
+    openModal: openHelpModal,
+    closeModal: closeHelpModal,
+  } = useModal();
 
   return (
     <div className="h-screen bg-gray-50 overflow-y-auto">
@@ -84,7 +30,7 @@ const AppContent: React.FC = () => {
           <Header />
           {/* 도움말 버튼 */}
           <button
-            onClick={() => setIsHelpModalOpen(true)}
+            onClick={openHelpModal}
             className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
             aria-label="도움말"
           >
@@ -103,8 +49,8 @@ const AppContent: React.FC = () => {
               <ProductSelector
                 products={productList}
                 selectedProductId={selectedProductId}
-                onProductSelect={handleProductSelect}
-                onAddToCart={handleAddToCart}
+                onProductSelect={selectProduct}
+                onAddToCart={() => addProductById(selectedProductId)}
               />
             </div>
 
@@ -112,8 +58,8 @@ const AppContent: React.FC = () => {
             <div className="bg-white border border-gray-200 p-8 rounded-lg shadow-sm">
               <CartContainer
                 cartItems={cartItems}
-                onQuantityChange={handleQuantityChange}
-                onRemoveItem={handleRemoveItem}
+                onQuantityChange={updateItemQuantity}
+                onRemoveItem={removeItemFromCart}
               />
             </div>
           </div>
@@ -126,10 +72,7 @@ const AppContent: React.FC = () => {
       </div>
 
       {/* 도움말 모달 */}
-      <HelpModal
-        isOpen={isHelpModalOpen}
-        onClose={() => setIsHelpModalOpen(false)}
-      />
+      <HelpModal isOpen={isHelpModalOpen} onClose={closeHelpModal} />
 
       {/* Toast 알림 */}
       <ToastContainer />
