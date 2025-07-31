@@ -3,7 +3,7 @@ import {
   startLightningSaleTimer,
   startRecommendationTimer,
   stopAllTimers,
-} from './modules_basic/promotion/promotionScheduler.js';
+} from './__modules__/promotion/promotionScheduler.js';
 
 // Product data and constants import
 import {
@@ -13,13 +13,13 @@ import {
   productList,
   findProductById,
   getTotalStock,
-} from './modules_basic/data/productData.js';
+} from './__modules__/data/productData.js';
 
 // Discount service import
-import { calculateDiscounts } from './modules_basic/services/discountService.js';
+import { calculateDiscounts } from './__modules__/services/discountService.js';
 
 // Loyalty service import
-import { calculateLoyaltyPoints } from './modules_basic/services/loyaltyService.js';
+import { calculateLoyaltyPoints } from './__modules__/services/loyaltyService.js';
 
 // Cart state management import
 import {
@@ -33,7 +33,7 @@ import {
   handleQuantityChange,
   handleRemoveItem,
   initializeCartState,
-} from './modules_basic/cart/cartState.js';
+} from './__modules__/cart/cartState.js';
 
 // UI Renderer import
 import {
@@ -49,7 +49,7 @@ import {
   updateDiscountInfo,
   updateTuesdaySpecialDisplay,
   updateLoyaltyPointsDisplay,
-} from './modules_basic/ui/uiRenderer.js';
+} from './__modules__/ui/uiRenderer.js';
 
 // 상수 import
 import {
@@ -59,13 +59,13 @@ import {
   EMPTY_STRING,
   CSS_CLASSES,
   ERROR_MESSAGES,
-} from './constants_basic/ui.js';
+} from './__constants__/ui.js';
 import {
   DISCOUNT_ICONS,
   DISCOUNT_LABELS,
   DISCOUNT_TEXTS,
   DISCOUNT_PERCENTAGES,
-} from './constants_basic/discount.js';
+} from './__constants__/discount.js';
 
 // 중복 코드 제거를 위한 헬퍼 함수들
 function getRequiredElement(
