@@ -30,7 +30,7 @@ function startLightningSaleTimer(
   const lightningDelay = TIMING_CONFIG.LIGHTNING_SALE_DELAY;
 
   setTimeout(() => {
-    lightningSaleTimer = setInterval(function () {
+    lightningSaleTimer = setInterval(() => {
       const availableProducts = productList.filter(
         (product) => product.stockQuantity > 0 && !product.isFlashSale
       );
@@ -73,8 +73,8 @@ function startRecommendationTimer(
   // 고정된 지연 시간 사용 (테스트 가능성 향상)
   const recommendationDelay = TIMING_CONFIG.RECOMMENDATION_DELAY;
 
-  setTimeout(function () {
-    recommendationTimer = setInterval(function () {
+  setTimeout(() => {
+    recommendationTimer = setInterval(() => {
       const lastSelectedId = getLastSelectedProductId();
       if (lastSelectedId) {
         const availableProducts = productList.filter(
