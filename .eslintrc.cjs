@@ -4,6 +4,7 @@ module.exports = {
     es2021: true,
   },
   extends: ['eslint:recommended'],
+  ignorePatterns: ['**/*.css', '**/__constants__/**', '**/__modules__/**'],
   overrides: [
     {
       // React + TypeScript 파일용 설정

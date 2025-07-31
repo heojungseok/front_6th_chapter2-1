@@ -3,6 +3,7 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useMemo,
   ReactNode,
 } from 'react';
 import { ToastMessage } from '../components/Toast/types';
@@ -49,11 +50,14 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  const value: ToastContextType = {
-    toasts,
-    showToast,
-    removeToast,
-  };
+  const value: ToastContextType = useMemo(
+    () => ({
+      toasts,
+      showToast,
+      removeToast,
+    }),
+    [toasts, showToast, removeToast]
+  );
 
   return (
     <ToastContext.Provider value={value}>{children}</ToastContext.Provider>

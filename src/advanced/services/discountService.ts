@@ -1,5 +1,5 @@
 import { CartItem, DiscountData, ItemDiscount } from '../types';
-import { DISCOUNT_PERCENTAGES, PRODUCT_CONSTANTS } from '../constants';
+import { DISCOUNT_PERCENTAGES } from '../constants';
 import {
   DISCOUNT_THRESHOLDS,
   PRODUCT_DISCOUNT_MAP,
