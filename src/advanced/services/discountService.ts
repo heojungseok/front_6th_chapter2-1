@@ -136,22 +136,19 @@ export const mergeDiscounts = (
   return Array.from(discountMap.values());
 };
 
-export const calculateDiscounts = (
+// 빈 할인 데이터 생성
+const createEmptyDiscountData = (): DiscountData => ({
+  totalAmount: 0,
+  itemDiscounts: [],
+  discountRate: 0,
+});
+
+// 모든 할인 유형 계산
+const calculateAllDiscountTypes = (
   items: CartItem[],
-  flashSaleProductId: string | null = null,
-  recommendationProductId: string | null = null
-): DiscountData => {
-  if (items.length === 0) {
-    return {
-      totalAmount: 0,
-      itemDiscounts: [],
-      discountRate: 0,
-    };
-  }
-
-  const subtotal = items.reduce((sum, item) => sum + item.itemTotal, 0);
-
-  // 각종 할인 계산
+  flashSaleProductId: string | null,
+  recommendationProductId: string | null
+) => {
   const individualDiscounts = items.map(calculateIndividualDiscount);
   const bulkDiscounts = calculateBulkDiscount(items);
   const tuesdayDiscounts = calculateTuesdayDiscount(items);
@@ -169,8 +166,7 @@ export const calculateDiscounts = (
     recommendationProductId
   );
 
-  // 할인 중복 처리
-  const allDiscounts = [
+  return [
     individualDiscounts,
     bulkDiscounts,
     tuesdayDiscounts,
@@ -178,8 +174,13 @@ export const calculateDiscounts = (
     recommendationDiscounts,
     superSaleDiscounts,
   ];
+};
 
-  const finalDiscounts = mergeDiscounts(allDiscounts);
+// 최종 할인 금액 및 할인율 계산
+const calculateFinalDiscountAmount = (
+  finalDiscounts: ItemDiscount[],
+  subtotal: number
+) => {
   const totalDiscountAmount = finalDiscounts.reduce(
     (sum, discount) => sum + discount.discountAmount,
     0
@@ -187,6 +188,30 @@ export const calculateDiscounts = (
   const totalAmount = subtotal - totalDiscountAmount;
   const discountRate =
     subtotal > 0 ? (totalDiscountAmount / subtotal) * 100 : 0;
+
+  return { totalAmount, totalDiscountAmount, discountRate };
+};
+
+export const calculateDiscounts = (
+  items: CartItem[],
+  flashSaleProductId: string | null = null,
+  recommendationProductId: string | null = null
+): DiscountData => {
+  if (items.length === 0) {
+    return createEmptyDiscountData();
+  }
+
+  const subtotal = items.reduce((sum, item) => sum + item.itemTotal, 0);
+  const allDiscounts = calculateAllDiscountTypes(
+    items,
+    flashSaleProductId,
+    recommendationProductId
+  );
+  const finalDiscounts = mergeDiscounts(allDiscounts);
+  const { totalAmount, discountRate } = calculateFinalDiscountAmount(
+    finalDiscounts,
+    subtotal
+  );
 
   return {
     totalAmount,

@@ -74,6 +74,26 @@ export const updateCartItemQuantity = (
   );
 };
 
+// 빈 장바구니 요약 생성
+const createEmptyCartSummary = (): CartSummary => ({
+  items: [],
+  subtotal: 0,
+  totalQuantity: 0,
+  discountData: {
+    totalAmount: 0,
+    itemDiscounts: [],
+    discountRate: 0,
+  },
+  loyaltyPoints: {
+    finalPoints: 0,
+    pointsDetail: {
+      basePoints: 0,
+      bonusPoints: 0,
+      bulkBonus: 0,
+    },
+  },
+});
+
 // 장바구니 요약 계산
 export const calculateCartSummary = (
   items: CartItem[],
@@ -81,37 +101,18 @@ export const calculateCartSummary = (
   recommendationProductId: string | null = null
 ): CartSummary => {
   if (items.length === 0) {
-    return {
-      items: [],
-      subtotal: 0,
-      totalQuantity: 0,
-      discountData: {
-        totalAmount: 0,
-        itemDiscounts: [],
-        discountRate: 0,
-      },
-      loyaltyPoints: {
-        finalPoints: 0,
-        pointsDetail: {
-          basePoints: 0,
-          bonusPoints: 0,
-          bulkBonus: 0,
-        },
-      },
-    };
+    return createEmptyCartSummary();
   }
 
   const subtotal = items.reduce((sum, item) => sum + item.itemTotal, 0);
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  // 할인 계산 (타이머 상태 반영)
   const discountData = calculateDiscounts(
     items,
     flashSaleProductId,
     recommendationProductId
   );
 
-  // 포인트 계산
   const loyaltyPoints = calculateLoyaltyPoints(
     discountData.totalAmount,
     totalQuantity,

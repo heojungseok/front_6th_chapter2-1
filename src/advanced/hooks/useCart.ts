@@ -12,7 +12,6 @@ export const useCart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { showStockError, showProductNotFoundError } = useErrorHandler();
 
-  // 상품 추가
   const addItemToCart = useCallback(
     (product: Product, quantity: number = 1) => {
       const currentQuantity =
@@ -29,7 +28,6 @@ export const useCart = () => {
     [cartItems, showStockError]
   );
 
-  // 상품 제거
   const removeItemFromCart = useCallback(
     (productId: string) => {
       const updatedCart = removeFromCart(cartItems, productId);
@@ -38,7 +36,6 @@ export const useCart = () => {
     [cartItems]
   );
 
-  // 수량 변경
   const updateItemQuantity = useCallback(
     (productId: string, change: number) => {
       const item = cartItems.find((item) => item.product.id === productId);
@@ -60,7 +57,6 @@ export const useCart = () => {
     [cartItems, removeItemFromCart]
   );
 
-  // 상품 ID로 상품 추가 (에러 처리 포함)
   const addProductById = useCallback(
     (productId: string) => {
       const product = productList.find((p) => p.id === productId);

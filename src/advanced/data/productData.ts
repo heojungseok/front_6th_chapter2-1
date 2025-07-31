@@ -50,21 +50,18 @@ export const productList: Product[] = [
   },
 ];
 
-// 상품 검색 함수
 export const findProductById = (id: string): Product | undefined => {
   return productList.find((product) => product.id === id);
 };
 
-// 전체 재고 계산 함수
-export const getTotalStock = (): number => {
+export const calculateTotalStock = (): number => {
   return productList.reduce(
     (total, product) => total + product.stockQuantity,
     0
   );
 };
 
-// 재고 부족 상품 조회 함수
-export const getLowStockProducts = (): Product[] => {
+export const findLowStockProducts = (): Product[] => {
   return productList.filter(
     (product) =>
       product.stockQuantity > 0 &&
@@ -72,13 +69,11 @@ export const getLowStockProducts = (): Product[] => {
   );
 };
 
-// 품절 상품 조회 함수
-export const getOutOfStockProducts = (): Product[] => {
+export const findOutOfStockProducts = (): Product[] => {
   return productList.filter((product) => product.stockQuantity === 0);
 };
 
-// 재고 상태 표시 함수
-export const getStockStatusDisplay = (product: Product): string => {
+export const generateStockStatusText = (product: Product): string => {
   if (product.stockQuantity === 0) {
     return '품절';
   }
