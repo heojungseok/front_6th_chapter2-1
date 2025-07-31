@@ -99,22 +99,22 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({ ... }) => {
 ```typescript
 // src/advanced/components/OrderSummary/index.tsx (85줄)
 const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
-  // 화요일 배너 로직 통합
-  const renderTuesdayBanner = () => { /* 화요일 배너 렌더링 */ };
+// 화요일 배너 로직 통합
+const renderTuesdayBanner = () => { /* 화요일 배너 렌더링 */ };
 
-  // 요약 아이템 렌더링 통합
-  const renderSummaryItem = (label, value, options) => { /* 요약 아이템 렌더링 */ };
+// 요약 아이템 렌더링 통합
+const renderSummaryItem = (label, value, options) => { /* 요약 아이템 렌더링 */ };
 
-  return (
-    <div className="bg-black text-white p-6 rounded-lg sticky top-4">
-      {renderTuesdayBanner()}
-      <div className="space-y-4">
-        {renderSummaryItem('소계', cartSummary.subtotal)}
-        <DiscountSection {...discountProps} />
-        {renderSummaryItem('총 금액', cartSummary.discountData.totalAmount, { isTotal: true })}
-      </div>
+return (
+  <div className="bg-black text-white p-6 rounded-lg sticky top-4">
+    {renderTuesdayBanner()}
+    <div className="space-y-4">
+      {renderSummaryItem('소계', cartSummary.subtotal)}
+      <DiscountSection {...discountProps} />
+      {renderSummaryItem('총 금액', cartSummary.discountData.totalAmount, { isTotal: true })}
     </div>
-  );
+  </div>
+);
 };
 ```
 
@@ -148,31 +148,31 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
 ```typescript
 // src/advanced/components/HelpModal/PolicySection.tsx (95줄)
 const PolicySection: React.FC = () => {
-  const discountPolicies = [ /* 할인 정책 데이터 */ ];
-  const pointsPolicies = [ /* 포인트 정책 데이터 */ ];
-  const stockPolicies = [ /* 재고 정책 데이터 */ ];
-  const tips = [ /* 사용 팁 데이터 */ ];
+const discountPolicies = [ /* 할인 정책 데이터 */ ];
+const pointsPolicies = [ /* 포인트 정책 데이터 */ ];
+const stockPolicies = [ /* 재고 정책 데이터 */ ];
+const tips = [ /* 사용 팁 데이터 */ ];
 
-  const renderPolicyCard = (title, icon, policies, bgColor, textColor, borderColor) => {
-    return (
-      <div className={`${bgColor} ${borderColor} border-2 rounded-lg p-6 shadow-sm`}>
-        <div className="flex items-center mb-4">
-          <span className="text-2xl mr-3">{icon}</span>
-          <h3 className={`text-xl font-semibold ${textColor}`}>{title}</h3>
-        </div>
-        {/* 정책 목록 렌더링 */}
-      </div>
-    );
-  };
-
+const renderPolicyCard = (title, icon, policies, bgColor, textColor, borderColor) => {
   return (
-    <div className="space-y-6">
-      {renderPolicyCard('할인 정책', '🎯', discountPolicies, 'bg-blue-50', 'text-blue-900', 'border-blue-200')}
-      {renderPolicyCard('포인트 적립', '🎁', pointsPolicies, 'bg-green-50', 'text-green-900', 'border-green-200')}
-      {renderPolicyCard('재고 관리', '📦', stockPolicies, 'bg-yellow-50', 'text-yellow-900', 'border-yellow-200')}
-      {renderPolicyCard('사용 팁', '💡', tips, 'bg-purple-50', 'text-purple-900', 'border-purple-200')}
+    <div className={`${bgColor} ${borderColor} border-2 rounded-lg p-6 shadow-sm`}>
+      <div className="flex items-center mb-4">
+        <span className="text-2xl mr-3">{icon}</span>
+        <h3 className={`text-xl font-semibold ${textColor}`}>{title}</h3>
+      </div>
+      {/* 정책 목록 렌더링 */}
     </div>
   );
+};
+
+return (
+  <div className="space-y-6">
+    {renderPolicyCard('할인 정책', '🎯', discountPolicies, 'bg-blue-50', 'text-blue-900', 'border-blue-200')}
+    {renderPolicyCard('포인트 적립', '🎁', pointsPolicies, 'bg-green-50', 'text-green-900', 'border-green-200')}
+    {renderPolicyCard('재고 관리', '📦', stockPolicies, 'bg-yellow-50', 'text-yellow-900', 'border-yellow-200')}
+    {renderPolicyCard('사용 팁', '💡', tips, 'bg-purple-50', 'text-purple-900', 'border-purple-200')}
+  </div>
+);
 };
 ```
 
@@ -188,24 +188,24 @@ const PolicySection: React.FC = () => {
 ```typescript
 // src/advanced/components/HelpModal/index.tsx (35줄)
 const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
-  // 모달 헤더 렌더링 통합
-  const renderModalHeader = () => {
-    return (
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">도움말</h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
-      </div>
-    );
-  };
-
+// 모달 헤더 렌더링 통합
+const renderModalHeader = () => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {renderModalHeader()}
-        <PolicySection />
-      </div>
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold text-gray-900">도움말</h2>
+      <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
     </div>
   );
+};
+
+return (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      {renderModalHeader()}
+      <PolicySection />
+    </div>
+  </div>
+);
 };
 ```
 
