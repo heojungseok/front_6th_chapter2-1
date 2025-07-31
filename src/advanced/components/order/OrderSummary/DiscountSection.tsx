@@ -1,7 +1,7 @@
 import React from 'react';
-import { CURRENCY_SYMBOL } from '../../constants';
-import { productList } from '../../data/productData';
-import { ItemDiscount, PointsDetail } from '../../types';
+import { CURRENCY_SYMBOL } from '../../../constants';
+import { productList } from '../../../data/productData';
+import { ItemDiscount, PointsDetail } from '../../../types';
 
 interface DiscountSectionProps {
   itemDiscounts: ReadonlyArray<ItemDiscount>;

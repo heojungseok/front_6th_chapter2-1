@@ -1,8 +1,8 @@
 import React from 'react';
-import { CartItem as CartItemType } from '../../types';
-import { useTimer } from '../../contexts/TimerContext';
-import { calculateCartSummary } from '../../services/cartService';
-import { CURRENCY_SYMBOL } from '../../constants';
+import { CartItem as CartItemType } from '../../../types';
+import { useTimer } from '../../../contexts/TimerContext';
+import { calculateCartSummary } from '../../../services/cartService';
+import { CURRENCY_SYMBOL } from '../../../constants';
 import DiscountSection from './DiscountSection';
 
 interface OrderSummaryProps {

@@ -5,12 +5,12 @@ import { ToastProvider } from './contexts/ToastContext';
 import { useCart } from './hooks/useCart';
 import { useProductSelection } from './hooks/useProductSelection';
 import { useModal } from './hooks/useModal';
-import Header from './components/Header';
-import ProductSelector from './components/ProductSelector';
-import CartContainer from './components/CartContainer';
-import OrderSummary from './components/OrderSummary';
-import HelpModal from './components/HelpModal';
-import ToastContainer from './components/Toast/ToastContainer';
+import { Header } from './components/common';
+import { ProductSelector } from './components/product';
+import { CartContainer } from './components/cart';
+import { OrderSummary } from './components/order';
+import { HelpModal } from './components/help';
+import { ToastContainer } from './components/common';
 
 const AppContent: React.FC = () => {
   const { cartItems, addProductById, removeItemFromCart, updateItemQuantity } =

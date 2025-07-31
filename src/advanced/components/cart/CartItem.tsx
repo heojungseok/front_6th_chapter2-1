@@ -1,7 +1,7 @@
 import React from 'react';
-import { CartItem as CartItemType } from '../types';
-import { CURRENCY_SYMBOL, CSS_CLASSES } from '../constants';
-import DiscountIcon from './DiscountIcon';
+import { CartItem as CartItemType } from '../../types';
+import { CURRENCY_SYMBOL, CSS_CLASSES } from '../../constants';
+import { DiscountIcon } from '../common';
 
 interface CartItemProps {
   item: CartItemType;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Product } from '../types';
-import { PRODUCT_CONSTANTS } from '../constants';
+import { Product } from '../../types';
+import { PRODUCT_CONSTANTS } from '../../constants';
 
 interface StockStatusProps {
   product: Product;

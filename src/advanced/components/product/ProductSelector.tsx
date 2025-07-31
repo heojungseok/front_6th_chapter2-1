@@ -1,10 +1,10 @@
 import React from 'react';
-import { Product } from '../types';
-import { CURRENCY_SYMBOL } from '../constants';
-import { useTimer } from '../contexts/TimerContext';
-import { getDiscountType } from '../utils/discountUtils';
+import { Product } from '../../types';
+import { CURRENCY_SYMBOL } from '../../constants';
+import { useTimer } from '../../contexts/TimerContext';
+import { getDiscountType } from '../../utils/discountUtils';
 import StockStatus from './StockStatus';
-import DiscountIcon from './DiscountIcon';
+import { DiscountIcon } from '../common';
 
 interface ProductSelectorProps {
   products: Product[];

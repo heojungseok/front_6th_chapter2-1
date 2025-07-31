@@ -1,5 +1,5 @@
 import React from 'react';
-import { DISCOUNT_ICONS, CSS_CLASSES } from '../constants';
+import { DISCOUNT_ICONS, CSS_CLASSES } from '../../constants';
 
 interface DiscountIconProps {
   discountType:

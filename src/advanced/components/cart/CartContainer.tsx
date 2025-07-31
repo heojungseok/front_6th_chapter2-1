@@ -1,7 +1,7 @@
 import React from 'react';
-import { CartItem as CartItemType } from '../types';
-import { useTimer } from '../contexts/TimerContext';
-import { getDiscountType } from '../utils/discountUtils';
+import { CartItem as CartItemType } from '../../types';
+import { useTimer } from '../../contexts/TimerContext';
+import { getDiscountType } from '../../utils/discountUtils';
 import CartItem from './CartItem';
 
 interface CartContainerProps {
