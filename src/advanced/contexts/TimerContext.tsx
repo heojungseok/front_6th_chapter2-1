@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { TimerState, timerService } from '../services/timerService';
 import { productList } from '../data/productData';
+import { useToast } from './ToastContext';
 
 // Context 타입 정의
 interface TimerContextType {
@@ -34,22 +35,30 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
     lastSelectedProductId: null,
   });
 
+  const { showToast } = useToast();
+
   // 타이머 서비스 초기화
   useEffect(() => {
     const handleFlashSaleChange = (productId: string) => {
       if (productId) {
-        // 번개세일 시작 알림
-        alert(
-          `⚡ 번개세일! ${productList.find((p) => p.id === productId)?.name} 상품이 20% 할인됩니다!`
+        // 번개세일 시작 Toast 알림
+        const product = productList.find((p) => p.id === productId);
+        showToast(
+          `⚡ 번개세일! ${product?.name} 상품이 20% 할인됩니다!`,
+          'warning',
+          3000
         );
       }
     };
 
     const handleRecommendationChange = (productId: string) => {
       if (productId) {
-        // 추천할인 시작 알림
-        alert(
-          `💝 추천할인! ${productList.find((p) => p.id === productId)?.name} 상품이 5% 할인됩니다!`
+        // 추천할인 시작 Toast 알림
+        const product = productList.find((p) => p.id === productId);
+        showToast(
+          `💝 추천할인! ${product?.name} 상품이 5% 할인됩니다!`,
+          'info',
+          3000
         );
       }
     };
@@ -70,7 +79,7 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
     return () => {
       timerService.cleanup();
     };
-  }, []);
+  }, [showToast]);
 
   // 마지막 선택 상품 업데이트
   const updateLastSelectedProduct = useCallback((productId: string) => {

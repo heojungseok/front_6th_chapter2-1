@@ -62,31 +62,99 @@ const PolicySection: React.FC = () => {
     },
   ];
 
-  // 정책 섹션 렌더링
-  const renderPolicySection = (
+  const tips = [
+    {
+      label: '화요일 대량구매:',
+      description: 'MAX 혜택을 받을 수 있는 최고의 타이밍',
+    },
+    {
+      label: '⚡+💝 중복:',
+      description: '25% SUPER SALE로 최대 할인 혜택',
+    },
+    {
+      label: '실시간 알림:',
+      description: 'Toast 알림으로 할인 정보 실시간 확인',
+    },
+    {
+      label: '재고 관리:',
+      description: '실시간 재고 확인으로 품절 방지',
+    },
+  ];
+
+  // 정책 섹션 렌더링 (카드 스타일)
+  const renderPolicyCard = (
     title: string,
-    policies: Array<{ label: string; description: string }>
+    icon: string,
+    policies: Array<{ label: string; description: string }>,
+    bgColor: string,
+    textColor: string,
+    borderColor: string
   ) => {
     return (
-      <section>
-        <h3 className="text-xl font-semibold text-gray-800 mb-3">{title}</h3>
-        <div className="space-y-3 text-gray-600">
+      <div
+        className={`${bgColor} ${borderColor} border-2 rounded-lg p-6 shadow-sm`}
+      >
+        <div className="flex items-center mb-4">
+          <span className="text-2xl mr-3">{icon}</span>
+          <h3 className={`text-xl font-semibold ${textColor}`}>{title}</h3>
+        </div>
+        <div className="space-y-3">
           {policies.map((policy) => (
             <div key={policy.label} className="flex items-start">
-              <span className="font-medium w-32">{policy.label}</span>
-              <span>{policy.description}</span>
+              <span className={`font-medium w-40 ${textColor} text-sm`}>
+                {policy.label}
+              </span>
+              <span className={`${textColor} text-sm flex-1`}>
+                {policy.description}
+              </span>
             </div>
           ))}
         </div>
-      </section>
+      </div>
     );
   };
 
   return (
     <div className="space-y-6">
-      {renderPolicySection('할인 정책', discountPolicies)}
-      {renderPolicySection('포인트 적립', pointsPolicies)}
-      {renderPolicySection('재고 관리', stockPolicies)}
+      {/* 할인 정책 */}
+      {renderPolicyCard(
+        '할인 정책',
+        '🎯',
+        discountPolicies,
+        'bg-blue-50',
+        'text-blue-900',
+        'border-blue-200'
+      )}
+
+      {/* 포인트 적립 */}
+      {renderPolicyCard(
+        '포인트 적립',
+        '🎁',
+        pointsPolicies,
+        'bg-green-50',
+        'text-green-900',
+        'border-green-200'
+      )}
+
+      {/* 재고 관리 */}
+      {renderPolicyCard(
+        '재고 관리',
+        '📦',
+        stockPolicies,
+        'bg-yellow-50',
+        'text-yellow-900',
+        'border-yellow-200'
+      )}
+
+      {/* 사용 팁 */}
+      {renderPolicyCard(
+        '사용 팁',
+        '💡',
+        tips,
+        'bg-purple-50',
+        'text-purple-900',
+        'border-purple-200'
+      )}
     </div>
   );
 };
