@@ -1,4 +1,20 @@
-// Product
+// Product 카테고리 타입
+export type ProductCategory =
+  | 'keyboard'
+  | 'mouse'
+  | 'monitor'
+  | 'accessory'
+  | 'audio';
+
+// 할인 타입
+export type DiscountType =
+  | 'flash_sale'
+  | 'recommendation'
+  | 'bulk'
+  | 'tuesday'
+  | 'super_sale';
+
+// 상품
 export interface Product {
   id: string;
   name: string;
@@ -6,54 +22,53 @@ export interface Product {
   stockQuantity: number;
   isFlashSale: boolean;
   isRecommended: boolean;
-  category: string;
+  category: ProductCategory;
 }
 
-// Cart
+// 장바구니 아이템
 export interface CartItem {
   product: Product;
   quantity: number;
   itemTotal: number;
 }
 
+// 할인 정보
+export interface ItemDiscount {
+  productId: string;
+  discountAmount: number;
+  discountRate: number;
+  discountType: DiscountType;
+}
+
+export interface DiscountData {
+  totalAmount: number;
+  itemDiscounts: ReadonlyArray<ItemDiscount>;
+  discountRate: number;
+}
+
+// 포인트 상세
+export interface PointsDetail {
+  basePoints: number;
+  bonusPoints: number;
+  bulkBonus: number;
+}
+
+// 포인트 정보
+export interface LoyaltyPoints {
+  finalPoints: number;
+  pointsDetail: PointsDetail;
+}
+
+// 장바구니 요약
 export interface CartSummary {
-  items: CartItem[];
+  items: ReadonlyArray<CartItem>;
   subtotal: number;
   totalQuantity: number;
   discountData: DiscountData;
   loyaltyPoints: LoyaltyPoints;
 }
 
-// Discount
-export interface DiscountData {
-  totalAmount: number;
-  itemDiscounts: ItemDiscount[];
-  discountRate: number;
-}
-
-export interface ItemDiscount {
-  productId: string;
-  discountAmount: number;
-  discountRate: number;
-  discountType:
-    | 'flash_sale'
-    | 'recommendation'
-    | 'bulk'
-    | 'tuesday'
-    | 'super_sale';
-}
-
-// Loyalty Points
-export interface LoyaltyPoints {
-  finalPoints: number;
-  pointsDetail: {
-    basePoints: number;
-    bonusPoints: number;
-    bulkBonus: number;
-  };
-}
-
-// UI State
+// UI 상태
 export interface UIState {
   selectedProductId: string | null;
   isManualMode: boolean;
@@ -63,7 +78,7 @@ export interface UIState {
   cartTotalDisplay: HTMLElement | null;
 }
 
-// Event Handlers
+// 핸들러 타입
 export type QuantityChangeHandler = (
   productId: string,
   changeAmount: number

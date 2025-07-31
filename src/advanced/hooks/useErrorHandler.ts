@@ -8,13 +8,16 @@ export interface ErrorMessage {
   title?: string;
 }
 
-/**
- * 에러 처리를 위한 커스텀 훅
- */
-export const useErrorHandler = () => {
+interface UseErrorHandlerReturn {
+  showError: (message: string, type?: ErrorType, title?: string) => void;
+  showStockError: (productName?: string) => void;
+  showProductNotFoundError: (productId: string) => void;
+  showNetworkError: (operation: string) => void;
+}
+
+export const useErrorHandler = (): UseErrorHandlerReturn => {
   const showError = useCallback(
     (message: string, type: ErrorType = 'error', title?: string) => {
-      // 개발 환경에서는 콘솔에 로그 출력
       if (
         typeof window !== 'undefined' &&
         window.location.hostname === 'localhost'
@@ -24,7 +27,6 @@ export const useErrorHandler = () => {
         );
       }
 
-      // 사용자에게 알림 표시 (향후 토스트 알림으로 개선 가능)
       switch (type) {
         case 'error':
           alert(`❌ ${title ? `${title}\n` : ''}${message}`);

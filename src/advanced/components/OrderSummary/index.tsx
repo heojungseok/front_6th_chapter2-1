@@ -6,14 +6,18 @@ import { CURRENCY_SYMBOL } from '../../constants';
 import DiscountSection from './DiscountSection';
 
 interface OrderSummaryProps {
-  cartItems: CartItemType[];
+  cartItems: ReadonlyArray<CartItemType>;
+}
+
+interface SummaryItemOptions {
+  isHighlighted?: boolean;
+  isTotal?: boolean;
 }
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
   const { timerState } = useTimer();
 
-  // 화요일 배너 로직 통합
-  const renderTuesdayBanner = () => {
+  const renderTuesdayBanner = (): JSX.Element | null => {
     const isTuesday = new Date().getDay() === 2;
     if (!isTuesday) return null;
 
@@ -24,15 +28,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
     );
   };
 
-  // 요약 아이템 렌더링 통합
   const renderSummaryItem = (
     label: string,
     value: string | number,
-    options?: {
-      isHighlighted?: boolean;
-      isTotal?: boolean;
-    }
-  ) => {
+    options?: SummaryItemOptions
+  ): JSX.Element => {
     const textColor = options?.isHighlighted ? 'text-green-400' : 'text-white';
     const textSize = options?.isTotal ? 'text-lg font-semibold' : 'text-base';
 

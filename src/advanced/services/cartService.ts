@@ -2,7 +2,6 @@ import { Product, CartItem, CartSummary } from '../types';
 import { calculateDiscounts } from './discountService';
 import { calculateLoyaltyPoints } from './loyaltyService';
 
-// 장바구니 아이템 생성
 export const createCartItem = (
   product: Product,
   quantity: number
@@ -14,7 +13,6 @@ export const createCartItem = (
   };
 };
 
-// 장바구니 아이템 업데이트
 export const updateCartItem = (
   item: CartItem,
   newQuantity: number
@@ -26,9 +24,8 @@ export const updateCartItem = (
   };
 };
 
-// 장바구니에 상품 추가
 export const addToCart = (
-  currentItems: CartItem[],
+  currentItems: ReadonlyArray<CartItem>,
   product: Product,
   quantity: number
 ): CartItem[] => {
@@ -37,7 +34,6 @@ export const addToCart = (
   );
 
   if (existingItemIndex >= 0) {
-    // 기존 아이템 수량 증가
     const existingItem = currentItems[existingItemIndex];
     const newQuantity = existingItem.quantity + quantity;
 
@@ -46,22 +42,19 @@ export const addToCart = (
 
     return updatedItems;
   }
-  // 새 아이템 추가
   const newItem = createCartItem(product, quantity);
   return [...currentItems, newItem];
 };
 
-// 장바구니에서 상품 제거
 export const removeFromCart = (
-  currentItems: CartItem[],
+  currentItems: ReadonlyArray<CartItem>,
   productId: string
 ): CartItem[] => {
   return currentItems.filter((item) => item.product.id !== productId);
 };
 
-// 장바구니 아이템 수량 변경
 export const updateCartItemQuantity = (
-  currentItems: CartItem[],
+  currentItems: ReadonlyArray<CartItem>,
   productId: string,
   newQuantity: number
 ): CartItem[] => {
@@ -74,7 +67,6 @@ export const updateCartItemQuantity = (
   );
 };
 
-// 빈 장바구니 요약 생성
 const createEmptyCartSummary = (): CartSummary => ({
   items: [],
   subtotal: 0,
@@ -94,9 +86,8 @@ const createEmptyCartSummary = (): CartSummary => ({
   },
 });
 
-// 장바구니 요약 계산
 export const calculateCartSummary = (
-  items: CartItem[],
+  items: ReadonlyArray<CartItem>,
   flashSaleProductId: string | null = null,
   recommendationProductId: string | null = null
 ): CartSummary => {
@@ -128,7 +119,6 @@ export const calculateCartSummary = (
   };
 };
 
-// 재고 확인
 export const checkStockAvailability = (
   product: Product,
   currentQuantity: number,
@@ -137,7 +127,6 @@ export const checkStockAvailability = (
   return product.stockQuantity >= requestedQuantity - currentQuantity;
 };
 
-// 장바구니 비우기
 export const clearCart = (): CartItem[] => {
   return [];
 };

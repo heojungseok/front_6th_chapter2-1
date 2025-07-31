@@ -8,8 +8,16 @@ import {
 } from '../services/cartService';
 import { useErrorHandler } from './useErrorHandler';
 
-export const useCart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+interface UseCartReturn {
+  cartItems: ReadonlyArray<CartItem>;
+  addItemToCart: (product: Product, quantity?: number) => void;
+  removeItemFromCart: (productId: string) => void;
+  updateItemQuantity: (productId: string, change: number) => void;
+  addProductById: (productId: string) => void;
+}
+
+export const useCart = (): UseCartReturn => {
+  const [cartItems, setCartItems] = useState<ReadonlyArray<CartItem>>([]);
   const { showStockError, showProductNotFoundError } = useErrorHandler();
 
   const addItemToCart = useCallback(

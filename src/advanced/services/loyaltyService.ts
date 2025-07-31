@@ -18,7 +18,7 @@ export const calculateTuesdayBonus = (basePoints: number): number => {
   return isTuesday ? basePoints : 0;
 };
 
-export const calculateSetBonus = (items: CartItem[]): number => {
+export const calculateSetBonus = (items: ReadonlyArray<CartItem>): number => {
   const productIds = items.map((item) => item.product.id);
 
   // 키보드+마우스+모니터암 풀세트
@@ -62,7 +62,7 @@ export const calculateAdditionalBonus = (totalAmount: number): number => {
 export const calculateLoyaltyPoints = (
   totalAmount: number,
   totalQuantity: number,
-  items: CartItem[]
+  items: ReadonlyArray<CartItem>
 ): LoyaltyPoints => {
   const basePoints = calculateBasePoints(totalAmount);
   const tuesdayBonus = calculateTuesdayBonus(basePoints);

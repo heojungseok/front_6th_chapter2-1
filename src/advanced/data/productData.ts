@@ -1,8 +1,7 @@
 import { Product } from '../types';
 import { PRODUCT_CONSTANTS } from '../constants';
 
-// 상품 데이터
-export const productList: Product[] = [
+export const productList: ReadonlyArray<Product> = [
   {
     id: 'product1',
     name: '버그 없애는 키보드',
@@ -48,7 +47,7 @@ export const productList: Product[] = [
     isRecommended: false,
     category: 'audio',
   },
-];
+] as const;
 
 export const findProductById = (id: string): Product | undefined => {
   return productList.find((product) => product.id === id);
@@ -61,7 +60,7 @@ export const calculateTotalStock = (): number => {
   );
 };
 
-export const findLowStockProducts = (): Product[] => {
+export const findLowStockProducts = (): ReadonlyArray<Product> => {
   return productList.filter(
     (product) =>
       product.stockQuantity > 0 &&
@@ -69,7 +68,7 @@ export const findLowStockProducts = (): Product[] => {
   );
 };
 
-export const findOutOfStockProducts = (): Product[] => {
+export const findOutOfStockProducts = (): ReadonlyArray<Product> => {
   return productList.filter((product) => product.stockQuantity === 0);
 };
 

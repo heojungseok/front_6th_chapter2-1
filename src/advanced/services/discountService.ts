@@ -18,7 +18,6 @@ export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
     };
   }
 
-  // 상품별 할인율 적용 (매핑 테이블 사용)
   const discountRate =
     PRODUCT_DISCOUNT_MAP[product.id as keyof typeof PRODUCT_DISCOUNT_MAP] || 0;
 
@@ -32,14 +31,15 @@ export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
   };
 };
 
-export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
+export const calculateBulkDiscount = (
+  items: ReadonlyArray<CartItem>
+): ItemDiscount[] => {
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
   if (totalQuantity < DISCOUNT_THRESHOLDS.BULK_DISCOUNT_MIN_QUANTITY) {
     return [];
   }
 
-  // 전체 수량 할인이 개별 할인보다 우선
   return items.map((item) => ({
     productId: item.product.id,
     discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.BULK / 100),
@@ -48,7 +48,9 @@ export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
   }));
 };
 
-export const calculateTuesdayDiscount = (items: CartItem[]): ItemDiscount[] => {
+export const calculateTuesdayDiscount = (
+  items: ReadonlyArray<CartItem>
+): ItemDiscount[] => {
   const today = new Date();
   const isTuesday = today.getDay() === DAYS_OF_WEEK.TUESDAY;
 
@@ -65,7 +67,7 @@ export const calculateTuesdayDiscount = (items: CartItem[]): ItemDiscount[] => {
 };
 
 export const calculateFlashSaleDiscount = (
-  items: CartItem[],
+  items: ReadonlyArray<CartItem>,
   flashSaleProductId: string | null
 ): ItemDiscount[] => {
   if (!flashSaleProductId) return [];
@@ -81,7 +83,7 @@ export const calculateFlashSaleDiscount = (
 };
 
 export const calculateRecommendationDiscount = (
-  items: CartItem[],
+  items: ReadonlyArray<CartItem>,
   recommendationProductId: string | null
 ): ItemDiscount[] => {
   if (!recommendationProductId) return [];
@@ -98,13 +100,12 @@ export const calculateRecommendationDiscount = (
 };
 
 export const calculateSuperSaleDiscount = (
-  items: CartItem[],
+  items: ReadonlyArray<CartItem>,
   flashSaleProductId: string | null,
   recommendationProductId: string | null
 ): ItemDiscount[] => {
   if (!flashSaleProductId || !recommendationProductId) return [];
 
-  // 번개세일과 추천할인이 같은 상품에 적용되는 경우
   if (flashSaleProductId === recommendationProductId) {
     return items
       .filter((item) => item.product.id === flashSaleProductId)
@@ -121,7 +122,7 @@ export const calculateSuperSaleDiscount = (
 };
 
 export const mergeDiscounts = (
-  allDiscounts: ItemDiscount[][]
+  allDiscounts: ReadonlyArray<ReadonlyArray<ItemDiscount>>
 ): ItemDiscount[] => {
   const discountMap = new Map<string, ItemDiscount>();
 
@@ -136,19 +137,17 @@ export const mergeDiscounts = (
   return Array.from(discountMap.values());
 };
 
-// 빈 할인 데이터 생성
 const createEmptyDiscountData = (): DiscountData => ({
   totalAmount: 0,
   itemDiscounts: [],
   discountRate: 0,
 });
 
-// 모든 할인 유형 계산
 const calculateAllDiscountTypes = (
-  items: CartItem[],
+  items: ReadonlyArray<CartItem>,
   flashSaleProductId: string | null,
   recommendationProductId: string | null
-) => {
+): ReadonlyArray<ReadonlyArray<ItemDiscount>> => {
   const individualDiscounts = items.map(calculateIndividualDiscount);
   const bulkDiscounts = calculateBulkDiscount(items);
   const tuesdayDiscounts = calculateTuesdayDiscount(items);
@@ -176,9 +175,8 @@ const calculateAllDiscountTypes = (
   ];
 };
 
-// 최종 할인 금액 및 할인율 계산
 const calculateFinalDiscountAmount = (
-  finalDiscounts: ItemDiscount[],
+  finalDiscounts: ReadonlyArray<ItemDiscount>,
   subtotal: number
 ) => {
   const totalDiscountAmount = finalDiscounts.reduce(
@@ -193,7 +191,7 @@ const calculateFinalDiscountAmount = (
 };
 
 export const calculateDiscounts = (
-  items: CartItem[],
+  items: ReadonlyArray<CartItem>,
   flashSaleProductId: string | null = null,
   recommendationProductId: string | null = null
 ): DiscountData => {

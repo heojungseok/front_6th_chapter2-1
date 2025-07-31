@@ -1,20 +1,10 @@
 import React from 'react';
 import { CURRENCY_SYMBOL } from '../../constants';
 import { productList } from '../../data/productData';
-
-interface DiscountItem {
-  productId: string;
-  discountRate: number;
-  discountAmount: number;
-}
-
-interface PointsDetail {
-  basePoints: number;
-  bonusPoints: number;
-}
+import { ItemDiscount, PointsDetail } from '../../types';
 
 interface DiscountSectionProps {
-  itemDiscounts: DiscountItem[];
+  itemDiscounts: ReadonlyArray<ItemDiscount>;
   finalPoints: number;
   pointsDetail: PointsDetail;
   hasItems: boolean;
@@ -26,8 +16,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({
   pointsDetail,
   hasItems,
 }) => {
-  // 할인 목록 렌더링
-  const renderDiscountList = () => {
+  const renderDiscountList = (): JSX.Element | null => {
     if (itemDiscounts.length === 0) return null;
 
     return (
@@ -55,8 +44,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({
     );
   };
 
-  // 포인트 표시 렌더링
-  const renderLoyaltyPoints = () => {
+  const renderLoyaltyPoints = (): JSX.Element | null => {
     if (!hasItems) return null;
 
     return (
