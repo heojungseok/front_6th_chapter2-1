@@ -6,10 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:advanced": "vite build --config vite.config.advanced.js",
     "preview": "vite preview",
-    "preview:advanced": "vite preview --config vite.config.advanced.js",
-    "start:basic": "vite serve --open ./index.basic.html",
     "start:advanced": "vite serve --open ./index.advanced.html",
     "test": "vitest",
     "test:basic": "vitest basic.test.js",
@@ -19,6 +16,7 @@
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.9",

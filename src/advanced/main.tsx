@@ -4,7 +4,7 @@ import App from './App';
 import './index.css';
 
 // React 앱을 DOM에 마운트
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById('app')!).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
