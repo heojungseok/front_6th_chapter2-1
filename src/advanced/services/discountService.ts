@@ -1,11 +1,16 @@
 import { CartItem, DiscountData, ItemDiscount } from '../types';
 import { DISCOUNT_PERCENTAGES, PRODUCT_CONSTANTS } from '../constants';
+import {
+  DISCOUNT_THRESHOLDS,
+  PRODUCT_DISCOUNT_MAP,
+  DAYS_OF_WEEK,
+} from '../constants/businessRules';
 
 // 개별 상품 할인 계산
 export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
   const { product, quantity } = item;
 
-  if (quantity < 10) {
+  if (quantity < DISCOUNT_THRESHOLDS.INDIVIDUAL_DISCOUNT_MIN_QUANTITY) {
     return {
       productId: product.id,
       discountAmount: 0,
@@ -14,27 +19,9 @@ export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
     };
   }
 
-  // 상품별 할인율 적용
-  let discountRate = 0;
-  switch (product.id) {
-    case 'product1': // 키보드
-      discountRate = 0.1;
-      break;
-    case 'product2': // 마우스
-      discountRate = 0.15;
-      break;
-    case 'product3': // 모니터암
-      discountRate = 0.2;
-      break;
-    case 'product4': // 노트북 파우치
-      discountRate = 0.05;
-      break;
-    case 'product5': // Lo-Fi 스피커
-      discountRate = 0.25;
-      break;
-    default:
-      discountRate = 0;
-  }
+  // 상품별 할인율 적용 (매핑 테이블 사용)
+  const discountRate =
+    PRODUCT_DISCOUNT_MAP[product.id as keyof typeof PRODUCT_DISCOUNT_MAP] || 0;
 
   const discountAmount = item.itemTotal * discountRate;
 
@@ -50,7 +37,7 @@ export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
 export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  if (totalQuantity < PRODUCT_CONSTANTS.BULK_DISCOUNT_THRESHOLD) {
+  if (totalQuantity < DISCOUNT_THRESHOLDS.BULK_DISCOUNT_MIN_QUANTITY) {
     return [];
   }
 
@@ -66,7 +53,7 @@ export const calculateBulkDiscount = (items: CartItem[]): ItemDiscount[] => {
 // 화요일 할인 계산
 export const calculateTuesdayDiscount = (items: CartItem[]): ItemDiscount[] => {
   const today = new Date();
-  const isTuesday = today.getDay() === 2; // 0=일요일, 2=화요일
+  const isTuesday = today.getDay() === DAYS_OF_WEEK.TUESDAY;
 
   if (!isTuesday) {
     return [];

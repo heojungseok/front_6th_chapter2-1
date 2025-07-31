@@ -1,5 +1,11 @@
 import { CartItem, LoyaltyPoints } from '../types';
 import { POINTS_CONFIG } from '../constants';
+import {
+  POINTS_THRESHOLDS,
+  POINTS_BONUS,
+  PRODUCT_IDS,
+  DAYS_OF_WEEK,
+} from '../constants/businessRules';
 
 // 기본 포인트 계산
 export const calculateBasePoints = (totalAmount: number): number => {
@@ -9,7 +15,7 @@ export const calculateBasePoints = (totalAmount: number): number => {
 // 화요일 보너스 포인트 계산
 export const calculateTuesdayBonus = (basePoints: number): number => {
   const today = new Date();
-  const isTuesday = today.getDay() === 2; // 0=일요일, 2=화요일
+  const isTuesday = today.getDay() === DAYS_OF_WEEK.TUESDAY;
 
   return isTuesday ? basePoints : 0;
 };
@@ -18,18 +24,21 @@ export const calculateTuesdayBonus = (basePoints: number): number => {
 export const calculateSetBonus = (items: CartItem[]): number => {
   const productIds = items.map((item) => item.product.id);
 
-  // 키보드+마우스+모니터암 풀세트 (50p)
+  // 키보드+마우스+모니터암 풀세트
   if (
-    productIds.includes('product1') &&
-    productIds.includes('product2') &&
-    productIds.includes('product3')
+    productIds.includes(PRODUCT_IDS.KEYBOARD) &&
+    productIds.includes(PRODUCT_IDS.MOUSE) &&
+    productIds.includes(PRODUCT_IDS.MONITOR_ARM)
   ) {
-    return 100;
+    return POINTS_BONUS.FULL_SET;
   }
 
-  // 키보드+마우스 세트 (30p)
-  if (productIds.includes('product1') && productIds.includes('product2')) {
-    return 50;
+  // 키보드+마우스 세트
+  if (
+    productIds.includes(PRODUCT_IDS.KEYBOARD) &&
+    productIds.includes(PRODUCT_IDS.MOUSE)
+  ) {
+    return POINTS_BONUS.KEYBOARD_MOUSE_SET;
   }
 
   return 0;
@@ -37,14 +46,14 @@ export const calculateSetBonus = (items: CartItem[]): number => {
 
 // 수량별 보너스 포인트 계산
 export const calculateQuantityBonus = (totalQuantity: number): number => {
-  if (totalQuantity >= 30) {
-    return POINTS_CONFIG.BULK_BONUS_POINTS;
+  if (totalQuantity >= POINTS_THRESHOLDS.BULK_BONUS_QUANTITY_3) {
+    return POINTS_BONUS.BULK_BONUS_3;
   }
-  if (totalQuantity >= 20) {
-    return 50;
+  if (totalQuantity >= POINTS_THRESHOLDS.BULK_BONUS_QUANTITY_2) {
+    return POINTS_BONUS.BULK_BONUS_2;
   }
-  if (totalQuantity >= 10) {
-    return 20;
+  if (totalQuantity >= POINTS_THRESHOLDS.BULK_BONUS_QUANTITY_1) {
+    return POINTS_BONUS.BULK_BONUS_1;
   }
 
   return 0;
