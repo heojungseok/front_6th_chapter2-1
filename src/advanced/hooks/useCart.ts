@@ -18,51 +18,82 @@ interface UseCartReturn {
 
 export const useCart = (): UseCartReturn => {
   const [cartItems, setCartItems] = useState<ReadonlyArray<CartItem>>([]);
-  const { showStockError, showProductNotFoundError } = useErrorHandler();
+  const { handleError, showProductNotFoundError } = useErrorHandler();
 
   const addItemToCart = useCallback(
     (product: Product, quantity: number = 1) => {
-      const currentQuantity =
-        cartItems.find((item) => item.product.id === product.id)?.quantity || 0;
-
-      if (product.stockQuantity <= currentQuantity) {
-        showStockError(product.name);
-        return;
+      try {
+        const updatedCart = addToCart(cartItems, product, quantity);
+        setCartItems(updatedCart);
+      } catch (error) {
+        if (error && typeof error === 'object' && 'code' in error) {
+          handleError(error as any);
+        } else {
+          handleError({
+            code: 'CART_ERROR',
+            message: '장바구니에 상품을 추가하는 중 오류가 발생했습니다.',
+            type: 'error',
+            timestamp: Date.now(),
+          });
+        }
       }
-
-      const updatedCart = addToCart(cartItems, product, quantity);
-      setCartItems(updatedCart);
     },
-    [cartItems, showStockError]
+    [cartItems, handleError]
   );
 
   const removeItemFromCart = useCallback(
     (productId: string) => {
-      const updatedCart = removeFromCart(cartItems, productId);
-      setCartItems(updatedCart);
+      try {
+        const updatedCart = removeFromCart(cartItems, productId);
+        setCartItems(updatedCart);
+      } catch (error) {
+        if (error && typeof error === 'object' && 'code' in error) {
+          handleError(error as any);
+        } else {
+          handleError({
+            code: 'CART_ERROR',
+            message: '장바구니에서 상품을 제거하는 중 오류가 발생했습니다.',
+            type: 'error',
+            timestamp: Date.now(),
+          });
+        }
+      }
     },
-    [cartItems]
+    [cartItems, handleError]
   );
 
   const updateItemQuantity = useCallback(
     (productId: string, change: number) => {
-      const item = cartItems.find((item) => item.product.id === productId);
-      if (!item) return;
+      try {
+        const item = cartItems.find((item) => item.product.id === productId);
+        if (!item) return;
 
-      const newQuantity = item.quantity + change;
+        const newQuantity = item.quantity + change;
 
-      if (newQuantity <= 0) {
-        removeItemFromCart(productId);
-      } else {
-        const updatedCart = updateCartItemQuantity(
-          cartItems,
-          productId,
-          newQuantity
-        );
-        setCartItems(updatedCart);
+        if (newQuantity <= 0) {
+          removeItemFromCart(productId);
+        } else {
+          const updatedCart = updateCartItemQuantity(
+            cartItems,
+            productId,
+            newQuantity
+          );
+          setCartItems(updatedCart);
+        }
+      } catch (error) {
+        if (error && typeof error === 'object' && 'code' in error) {
+          handleError(error as any);
+        } else {
+          handleError({
+            code: 'CART_ERROR',
+            message: '상품 수량을 변경하는 중 오류가 발생했습니다.',
+            type: 'error',
+            timestamp: Date.now(),
+          });
+        }
       }
     },
-    [cartItems, removeItemFromCart]
+    [cartItems, removeItemFromCart, handleError]
   );
 
   const addProductById = useCallback(

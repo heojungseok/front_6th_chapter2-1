@@ -85,3 +85,32 @@ export type QuantityChangeHandler = (
 ) => void;
 export type RemoveItemHandler = (productId: string) => void;
 export type ProductSelectHandler = (productId: string) => void;
+
+// 에러 처리 관련 타입
+export type ErrorType = 'error' | 'warning' | 'info';
+
+export type ErrorCode =
+  | 'STOCK_INSUFFICIENT'
+  | 'PRODUCT_NOT_FOUND'
+  | 'NETWORK_ERROR'
+  | 'VALIDATION_ERROR'
+  | 'TIMER_ERROR'
+  | 'CART_ERROR'
+  | 'DISCOUNT_ERROR'
+  | 'LOYALTY_ERROR';
+
+export interface AppError {
+  code: ErrorCode;
+  message: string;
+  type: ErrorType;
+  details?: unknown;
+  timestamp?: number;
+}
+
+export interface ErrorHandler {
+  handleError: (error: AppError) => void;
+  showError: (message: string, type?: ErrorType, title?: string) => void;
+  showStockError: (productName?: string) => void;
+  showProductNotFoundError: (productId: string) => void;
+  showNetworkError: (operation: string) => void;
+}

@@ -1,11 +1,20 @@
 import { Product, CartItem, CartSummary } from '../types';
 import { calculateDiscounts } from './discountService';
 import { calculateLoyaltyPoints } from './loyaltyService';
+import { createCartError, createStockError } from '../utils/errorFactory';
 
 export const createCartItem = (
   product: Product,
   quantity: number
 ): CartItem => {
+  if (quantity <= 0) {
+    throw createCartError('수량은 1개 이상이어야 합니다.');
+  }
+
+  if (product.stockQuantity < quantity) {
+    throw createStockError(product.name);
+  }
+
   return {
     product,
     quantity,
@@ -17,6 +26,14 @@ export const updateCartItem = (
   item: CartItem,
   newQuantity: number
 ): CartItem => {
+  if (newQuantity < 0) {
+    throw createCartError('수량은 0개 이상이어야 합니다.');
+  }
+
+  if (item.product.stockQuantity < newQuantity) {
+    throw createStockError(item.product.name);
+  }
+
   return {
     ...item,
     quantity: newQuantity,
@@ -29,6 +46,10 @@ export const addToCart = (
   product: Product,
   quantity: number
 ): CartItem[] => {
+  if (quantity <= 0) {
+    throw createCartError('추가할 수량은 1개 이상이어야 합니다.');
+  }
+
   const existingItemIndex = currentItems.findIndex(
     (item) => item.product.id === product.id
   );
@@ -37,11 +58,16 @@ export const addToCart = (
     const existingItem = currentItems[existingItemIndex];
     const newQuantity = existingItem.quantity + quantity;
 
+    if (product.stockQuantity < newQuantity) {
+      throw createStockError(product.name);
+    }
+
     const updatedItems = [...currentItems];
     updatedItems[existingItemIndex] = updateCartItem(existingItem, newQuantity);
 
     return updatedItems;
   }
+
   const newItem = createCartItem(product, quantity);
   return [...currentItems, newItem];
 };
@@ -50,6 +76,12 @@ export const removeFromCart = (
   currentItems: ReadonlyArray<CartItem>,
   productId: string
 ): CartItem[] => {
+  const itemExists = currentItems.some((item) => item.product.id === productId);
+
+  if (!itemExists) {
+    throw createCartError('장바구니에 해당 상품이 없습니다.');
+  }
+
   return currentItems.filter((item) => item.product.id !== productId);
 };
 
@@ -60,6 +92,12 @@ export const updateCartItemQuantity = (
 ): CartItem[] => {
   if (newQuantity <= 0) {
     return removeFromCart(currentItems, productId);
+  }
+
+  const itemExists = currentItems.some((item) => item.product.id === productId);
+
+  if (!itemExists) {
+    throw createCartError('장바구니에 해당 상품이 없습니다.');
   }
 
   return currentItems.map((item) =>
