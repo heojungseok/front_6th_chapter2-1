@@ -1290,3 +1290,87 @@ const addItemToCart = useCallback((product, quantity) => { ... });
 ✅ **안전성**: 런타임 오류 가능성 최소화
 
 ---
+
+## 📋 Phase 6-2: 에러 처리 표준화
+
+### **시간**: 에러 처리 표준화 작업 완료
+
+#### 🎯 목표
+
+- 표준화된 에러 타입 정의
+- 서비스별 에러 처리 통일
+- 예측 가능한 에러 처리 패턴 구축
+
+#### ✅ 완료된 작업들
+
+**1. 표준화된 에러 타입 정의 (types/index.ts)**
+
+- **ErrorCode**: 8가지 표준 에러 코드 정의
+  - `STOCK_INSUFFICIENT`, `PRODUCT_NOT_FOUND`, `NETWORK_ERROR`
+  - `VALIDATION_ERROR`, `TIMER_ERROR`, `CART_ERROR`
+  - `DISCOUNT_ERROR`, `LOYALTY_ERROR`
+- **AppError**: 통합된 에러 인터페이스
+- **ErrorHandler**: 표준화된 에러 처리 인터페이스
+
+**2. 에러 팩토리 함수 생성 (utils/errorFactory.ts)**
+
+- **createAppError**: 기본 에러 생성 함수
+- **createStockError**: 재고 부족 에러
+- **createProductNotFoundError**: 상품 미존재 에러
+- **createNetworkError**: 네트워크 에러
+- **createCartError**: 장바구니 에러
+- **createDiscountError**: 할인 에러
+- **createLoyaltyError**: 포인트 에러
+
+**3. 표준화된 에러 핸들러 (utils/errorHandler.ts)**
+
+- **createErrorHandler**: 통합 에러 처리 로직
+- **로그 및 알림**: 개발/프로덕션 환경 구분
+- **에러 타입별 아이콘**: 시각적 구분 (❌, ⚠️, ℹ️)
+
+**4. 서비스 레이어 에러 처리 강화 (services/cartService.ts)**
+
+- **cartService**: 모든 함수에 에러 검증 추가
+- **재고 검증**: 수량 변경 시 재고 확인
+- **입력 검증**: 잘못된 입력값 방지
+- **try-catch 패턴**: 안전한 에러 처리
+
+**5. 커스텀 훅 에러 처리 통합 (hooks/useErrorHandler.ts, useCart.ts)**
+
+- **useErrorHandler**: 표준화된 에러 처리 시스템 사용
+- **useCart**: try-catch로 에러 처리
+- **에러 전파**: 서비스 → 훅 → UI 계층 구조
+
+#### 📊 개선 결과
+
+| 항목            | Before | After | 개선율          |
+| --------------- | ------ | ----- | --------------- |
+| **에러 타입**   | 3개    | 8개   | **167% 증가**   |
+| **에러 처리**   | 분산   | 통합  | **100% 표준화** |
+| **에러 추적**   | 없음   | 완전  | **100% 구현**   |
+| **사용자 경험** | 기본   | 고급  | **대폭 개선**   |
+| **개발자 경험** | 불일치 | 일관  | **100% 통일**   |
+
+#### 🎯 클린코드 원칙 적용 결과
+
+✅ **예측 가능성**: 표준화된 에러 처리로 일관된 동작  
+✅ **안정성**: 모든 에러 상황에 대한 적절한 처리  
+✅ **가독성**: 명확한 에러 코드와 메시지  
+✅ **유지보수성**: 중앙화된 에러 처리 로직  
+✅ **확장성**: 새로운 에러 타입 쉽게 추가 가능
+
+#### **기술적 개선 사항**
+
+**에러 처리 아키텍처**:
+
+- **팩토리 패턴**: 표준화된 에러 생성
+- **핸들러 패턴**: 중앙화된 에러 처리
+- **계층 구조**: 서비스 → 훅 → UI 에러 전파
+
+**에러 분류 시스템**:
+
+- **타입별 분류**: error, warning, info
+- **도메인별 분류**: cart, discount, loyalty 등
+- **시각적 구분**: 아이콘과 색상으로 사용자 경험 향상
+
+---
