@@ -1,4 +1,10 @@
 import { AppError, ErrorHandler, ErrorType } from '../types';
+import {
+  createStockError,
+  createProductNotFoundError,
+  createNetworkError,
+  createValidationError,
+} from './errorFactory';
 
 export const createErrorHandler = (): ErrorHandler => {
   const logError = (error: AppError): void => {
@@ -45,12 +51,7 @@ export const createErrorHandler = (): ErrorHandler => {
     type: ErrorType = 'error',
     title?: string
   ): void => {
-    const error: AppError = {
-      code: 'VALIDATION_ERROR',
-      message,
-      type,
-      timestamp: Date.now(),
-    };
+    const error = createValidationError(message);
 
     if (title) {
       let icon = 'ℹ️';
@@ -66,34 +67,17 @@ export const createErrorHandler = (): ErrorHandler => {
   };
 
   const showStockError = (productName?: string): void => {
-    const error: AppError = {
-      code: 'STOCK_INSUFFICIENT',
-      message: productName
-        ? `${productName}의 재고가 부족합니다.`
-        : '재고가 부족합니다.',
-      type: 'warning',
-      timestamp: Date.now(),
-    };
+    const error = createStockError(productName);
     handleError(error);
   };
 
   const showProductNotFoundError = (productId: string): void => {
-    const error: AppError = {
-      code: 'PRODUCT_NOT_FOUND',
-      message: `상품을 찾을 수 없습니다: ${productId}`,
-      type: 'error',
-      timestamp: Date.now(),
-    };
+    const error = createProductNotFoundError(productId);
     handleError(error);
   };
 
   const showNetworkError = (operation: string): void => {
-    const error: AppError = {
-      code: 'NETWORK_ERROR',
-      message: `${operation} 중 네트워크 오류가 발생했습니다.`,
-      type: 'error',
-      timestamp: Date.now(),
-    };
+    const error = createNetworkError(operation);
     handleError(error);
   };
 

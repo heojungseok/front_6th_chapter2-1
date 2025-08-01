@@ -5,6 +5,11 @@ import {
   PRODUCT_DISCOUNT_MAP,
   DAYS_OF_WEEK,
 } from '../constants/businessRules';
+import {
+  calculateConditionalDiscount,
+  calculateProductSpecificDiscount,
+  discountCalculators,
+} from '../utils/discountUtils';
 
 export const calculateIndividualDiscount = (item: CartItem): ItemDiscount => {
   const { product, quantity } = item;
@@ -35,17 +40,15 @@ export const calculateBulkDiscount = (
   items: ReadonlyArray<CartItem>
 ): ItemDiscount[] => {
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+  const isBulkEligible =
+    totalQuantity >= DISCOUNT_THRESHOLDS.BULK_DISCOUNT_MIN_QUANTITY;
 
-  if (totalQuantity < DISCOUNT_THRESHOLDS.BULK_DISCOUNT_MIN_QUANTITY) {
-    return [];
-  }
-
-  return items.map((item) => ({
-    productId: item.product.id,
-    discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.BULK / 100),
-    discountRate: DISCOUNT_PERCENTAGES.BULK / 100,
-    discountType: 'bulk',
-  }));
+  return calculateConditionalDiscount(
+    items,
+    isBulkEligible,
+    'bulk',
+    DISCOUNT_PERCENTAGES.BULK
+  );
 };
 
 export const calculateTuesdayDiscount = (
@@ -54,49 +57,36 @@ export const calculateTuesdayDiscount = (
   const today = new Date();
   const isTuesday = today.getDay() === DAYS_OF_WEEK.TUESDAY;
 
-  if (!isTuesday) {
-    return [];
-  }
-
-  return items.map((item) => ({
-    productId: item.product.id,
-    discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.TUESDAY / 100),
-    discountRate: DISCOUNT_PERCENTAGES.TUESDAY / 100,
-    discountType: 'tuesday',
-  }));
+  return calculateConditionalDiscount(
+    items,
+    isTuesday,
+    'tuesday',
+    DISCOUNT_PERCENTAGES.TUESDAY
+  );
 };
 
 export const calculateFlashSaleDiscount = (
   items: ReadonlyArray<CartItem>,
   flashSaleProductId: string | null
 ): ItemDiscount[] => {
-  if (!flashSaleProductId) return [];
-
-  return items
-    .filter((item) => item.product.id === flashSaleProductId)
-    .map((item) => ({
-      productId: item.product.id,
-      discountAmount: item.itemTotal * (DISCOUNT_PERCENTAGES.FLASH_SALE / 100),
-      discountRate: DISCOUNT_PERCENTAGES.FLASH_SALE / 100,
-      discountType: 'flash_sale',
-    }));
+  return calculateProductSpecificDiscount(
+    items,
+    flashSaleProductId,
+    'flash_sale',
+    DISCOUNT_PERCENTAGES.FLASH_SALE
+  );
 };
 
 export const calculateRecommendationDiscount = (
   items: ReadonlyArray<CartItem>,
   recommendationProductId: string | null
 ): ItemDiscount[] => {
-  if (!recommendationProductId) return [];
-
-  return items
-    .filter((item) => item.product.id === recommendationProductId)
-    .map((item) => ({
-      productId: item.product.id,
-      discountAmount:
-        item.itemTotal * (DISCOUNT_PERCENTAGES.RECOMMENDATION / 100),
-      discountRate: DISCOUNT_PERCENTAGES.RECOMMENDATION / 100,
-      discountType: 'recommendation',
-    }));
+  return calculateProductSpecificDiscount(
+    items,
+    recommendationProductId,
+    'recommendation',
+    DISCOUNT_PERCENTAGES.RECOMMENDATION
+  );
 };
 
 export const calculateSuperSaleDiscount = (
