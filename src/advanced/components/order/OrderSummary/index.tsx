@@ -17,7 +17,7 @@ interface SummaryItemOptions {
 const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
   const { timerState } = useTimer();
 
-  const renderTuesdayBanner = (): JSX.Element | null => {
+  const renderTuesdayBanner = (): React.ReactElement | null => {
     const isTuesday = new Date().getDay() === 2;
     if (!isTuesday) return null;
 
@@ -32,7 +32,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems }) => {
     label: string,
     value: string | number,
     options?: SummaryItemOptions
-  ): JSX.Element => {
+  ): React.ReactElement => {
     const textColor = options?.isHighlighted ? 'text-green-400' : 'text-white';
     const textSize = options?.isTotal ? 'text-lg font-semibold' : 'text-base';
 

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { CartItem, Product } from '../types';
+import { CartItem, Product, AppError } from '../types';
 import { productList } from '../data/productData';
 import {
   addToCart,
@@ -27,7 +27,7 @@ export const useCart = (): UseCartReturn => {
         setCartItems(updatedCart);
       } catch (error) {
         if (error && typeof error === 'object' && 'code' in error) {
-          handleError(error as any);
+          handleError(error as AppError);
         } else {
           handleError({
             code: 'CART_ERROR',
@@ -48,7 +48,7 @@ export const useCart = (): UseCartReturn => {
         setCartItems(updatedCart);
       } catch (error) {
         if (error && typeof error === 'object' && 'code' in error) {
-          handleError(error as any);
+          handleError(error as AppError);
         } else {
           handleError({
             code: 'CART_ERROR',
@@ -82,7 +82,7 @@ export const useCart = (): UseCartReturn => {
         }
       } catch (error) {
         if (error && typeof error === 'object' && 'code' in error) {
-          handleError(error as any);
+          handleError(error as AppError);
         } else {
           handleError({
             code: 'CART_ERROR',

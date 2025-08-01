@@ -53,9 +53,13 @@ export const createErrorHandler = (): ErrorHandler => {
     };
 
     if (title) {
-      alert(
-        `${type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'} ${title}\n${message}`
-      );
+      let icon = 'ℹ️';
+      if (type === 'error') {
+        icon = '❌';
+      } else if (type === 'warning') {
+        icon = '⚠️';
+      }
+      alert(`${icon} ${title}\n${message}`);
     } else {
       handleError(error);
     }

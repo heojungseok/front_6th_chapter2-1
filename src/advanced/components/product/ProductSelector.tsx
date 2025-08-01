@@ -7,7 +7,7 @@ import StockStatus from './StockStatus';
 import { DiscountIcon } from '../common';
 
 interface ProductSelectorProps {
-  products: Product[];
+  products: ReadonlyArray<Product>;
   selectedProductId: string;
   onProductSelect: (productId: string) => void;
   onAddToCart: () => void;

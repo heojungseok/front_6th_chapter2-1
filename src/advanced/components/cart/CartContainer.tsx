@@ -5,7 +5,7 @@ import { getDiscountType } from '../../utils/discountUtils';
 import CartItem from './CartItem';
 
 interface CartContainerProps {
-  cartItems: CartItemType[];
+  cartItems: ReadonlyArray<CartItemType>;
   onQuantityChange: (productId: string, change: number) => void;
   onRemoveItem: (productId: string) => void;
 }

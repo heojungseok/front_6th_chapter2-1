@@ -6,7 +6,7 @@ import React, {
   useMemo,
   ReactNode,
 } from 'react';
-import { ToastMessage } from '../components/Toast/types';
+import { ToastMessage } from '../components/common/Toast/types';
 
 interface ToastContextType {
   toasts: ToastMessage[];

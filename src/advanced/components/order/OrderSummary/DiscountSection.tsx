@@ -16,7 +16,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({
   pointsDetail,
   hasItems,
 }) => {
-  const renderDiscountList = (): JSX.Element | null => {
+  const renderDiscountList = (): React.ReactElement | null => {
     if (itemDiscounts.length === 0) return null;
 
     return (
@@ -44,7 +44,7 @@ const DiscountSection: React.FC<DiscountSectionProps> = ({
     );
   };
 
-  const renderLoyaltyPoints = (): JSX.Element | null => {
+  const renderLoyaltyPoints = (): React.ReactElement | null => {
     if (!hasItems) return null;
 
     return (

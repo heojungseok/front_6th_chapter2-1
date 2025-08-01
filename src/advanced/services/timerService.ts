@@ -15,13 +15,13 @@ export type TimerCallback = (productId: string) => void;
 
 // 타이머 서비스 클래스
 export class TimerService {
-  private flashSaleTimer: NodeJS.Timeout | null = null;
+  private flashSaleTimer: number | null = null;
 
-  private recommendationTimer: NodeJS.Timeout | null = null;
+  private recommendationTimer: number | null = null;
 
-  private flashSaleStartTimer: NodeJS.Timeout | null = null;
+  private flashSaleStartTimer: number | null = null;
 
-  private recommendationStartTimer: NodeJS.Timeout | null = null;
+  private recommendationStartTimer: number | null = null;
 
   private state: TimerState = {
     isFlashSaleActive: false,
@@ -31,7 +31,7 @@ export class TimerService {
     lastSelectedProductId: null,
   };
 
-  private products: Product[] = [];
+  private products: ReadonlyArray<Product> = [];
 
   private onFlashSaleChange: TimerCallback | null = null;
 
@@ -41,7 +41,7 @@ export class TimerService {
 
   // 초기화
   initialize(
-    products: Product[],
+    products: ReadonlyArray<Product>,
     onFlashSaleChange: TimerCallback,
     onRecommendationChange: TimerCallback,
     onStateChange: (state: TimerState) => void

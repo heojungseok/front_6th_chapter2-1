@@ -1,18 +1,17 @@
 import { Product, CartItem, CartSummary } from '../types';
 import { calculateDiscounts } from './discountService';
 import { calculateLoyaltyPoints } from './loyaltyService';
-import { createCartError, createStockError } from '../utils/errorFactory';
 
 export const createCartItem = (
   product: Product,
   quantity: number
 ): CartItem => {
   if (quantity <= 0) {
-    throw createCartError('수량은 1개 이상이어야 합니다.');
+    throw new Error('수량은 1개 이상이어야 합니다.');
   }
 
   if (product.stockQuantity < quantity) {
-    throw createStockError(product.name);
+    throw new Error(`${product.name}의 재고가 부족합니다.`);
   }
 
   return {
@@ -27,11 +26,11 @@ export const updateCartItem = (
   newQuantity: number
 ): CartItem => {
   if (newQuantity < 0) {
-    throw createCartError('수량은 0개 이상이어야 합니다.');
+    throw new Error('수량은 0개 이상이어야 합니다.');
   }
 
   if (item.product.stockQuantity < newQuantity) {
-    throw createStockError(item.product.name);
+    throw new Error(`${item.product.name}의 재고가 부족합니다.`);
   }
 
   return {
@@ -47,7 +46,7 @@ export const addToCart = (
   quantity: number
 ): CartItem[] => {
   if (quantity <= 0) {
-    throw createCartError('추가할 수량은 1개 이상이어야 합니다.');
+    throw new Error('추가할 수량은 1개 이상이어야 합니다.');
   }
 
   const existingItemIndex = currentItems.findIndex(
@@ -59,7 +58,7 @@ export const addToCart = (
     const newQuantity = existingItem.quantity + quantity;
 
     if (product.stockQuantity < newQuantity) {
-      throw createStockError(product.name);
+      throw new Error(`${product.name}의 재고가 부족합니다.`);
     }
 
     const updatedItems = [...currentItems];
@@ -79,7 +78,7 @@ export const removeFromCart = (
   const itemExists = currentItems.some((item) => item.product.id === productId);
 
   if (!itemExists) {
-    throw createCartError('장바구니에 해당 상품이 없습니다.');
+    throw new Error('장바구니에 해당 상품이 없습니다.');
   }
 
   return currentItems.filter((item) => item.product.id !== productId);
@@ -97,7 +96,7 @@ export const updateCartItemQuantity = (
   const itemExists = currentItems.some((item) => item.product.id === productId);
 
   if (!itemExists) {
-    throw createCartError('장바구니에 해당 상품이 없습니다.');
+    throw new Error('장바구니에 해당 상품이 없습니다.');
   }
 
   return currentItems.map((item) =>
