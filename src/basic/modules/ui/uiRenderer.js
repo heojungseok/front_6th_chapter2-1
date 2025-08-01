@@ -1,4 +1,7 @@
-// UI Renderer module - React 컴포넌트 네이밍 규칙 적용
+// =============================================================================
+// UI RENDERER MODULE - React 컴포넌트 네이밍 규칙 적용
+// =============================================================================
+
 import {
   setProductSelectElement,
   setStockStatusDisplay,
@@ -13,6 +16,10 @@ import {
 } from '../data/productData.js';
 import { isTuesday } from '../services/discountService.js';
 import { DISCOUNT_RATES } from '../data/productData.js';
+
+// =============================================================================
+// MAIN UI COMPONENTS
+// =============================================================================
 
 // Header 컴포넌트
 export function Header() {
@@ -99,8 +106,9 @@ export function OrderSummary() {
       <span id="points-notice">Earn loyalty points with purchase.</span>
     </p>
   `;
-  const cartTotalDisplay = rightColumn.querySelector('#cart-total');
-  setCartTotalDisplay(cartTotalDisplay);
+
+  setCartTotalDisplay(rightColumn.querySelector('#cart-total'));
+
   return rightColumn;
 }
 
@@ -193,7 +201,6 @@ export function ManualOverlay() {
   manualOverlay.addEventListener('click', (e) => {
     if (e.target === manualOverlay) {
       manualOverlay.classList.add('hidden');
-      manualColumn.classList.add('translate-x-full');
     }
   });
 
@@ -206,6 +213,10 @@ export function ManualOverlay() {
 
   return { manualToggle, manualOverlay };
 }
+
+// =============================================================================
+// CART ITEM COMPONENT
+// =============================================================================
 
 // CartItem 컴포넌트
 export function CartItem(product) {
@@ -233,6 +244,10 @@ export function CartItem(product) {
 
   return cartItem;
 }
+
+// =============================================================================
+// STOCK & ITEM COUNT UPDATE FUNCTIONS
+// =============================================================================
 
 // UI 업데이트 함수들
 export function updateStockInfo() {
@@ -263,6 +278,10 @@ export function updateItemCountDisplay(count) {
     itemCountElement.textContent = `🛍️ ${count} items in cart`;
   }
 }
+
+// =============================================================================
+// SUMMARY DETAILS UPDATE FUNCTIONS
+// =============================================================================
 
 export function updateSummaryDetails(cartItems, subtotal, itemDiscounts) {
   const summaryDetails = document.getElementById('summary-details');
@@ -301,11 +320,15 @@ export function updateSummaryDetails(cartItems, subtotal, itemDiscounts) {
   summaryDetails.appendChild(fragment);
 }
 
-// 헬퍼 함수들로 분리 (20라인 이하)
+// =============================================================================
+// SUMMARY FRAGMENT HELPER FUNCTIONS
+// =============================================================================
+
 function addCartItemsToFragment(cartItems, fragment) {
-  Array.from(cartItems).forEach((itemElement) => {
+  for (let i = 0; i < cartItems.length; i++) {
+    const itemElement = cartItems[i];
     const product = findProductById(itemElement.id);
-    if (!product) return;
+    if (!product) continue;
 
     const quantity = parseInt(
       itemElement.querySelector('.quantity-number').textContent
@@ -314,12 +337,18 @@ function addCartItemsToFragment(cartItems, fragment) {
 
     const itemRow = createSummaryItemRow(product.name, quantity, itemTotal);
     fragment.appendChild(itemRow);
-  });
+  }
 }
 
 function addDiscountRowsToFragment(itemDiscounts, fragment) {
-  const discountRows = createDiscountRows(itemDiscounts);
-  discountRows.forEach((row) => fragment.appendChild(row));
+  itemDiscounts.forEach(({ name, discount }) => {
+    const discountRow = createSummaryRow(
+      `${name} 할인`,
+      `-${discount}%`,
+      'text-green-400'
+    );
+    fragment.appendChild(discountRow);
+  });
 }
 
 function addTuesdayDiscountToFragment(fragment) {
@@ -329,11 +358,15 @@ function addTuesdayDiscountToFragment(fragment) {
   }
 }
 
+// =============================================================================
+// SUMMARY ROW CREATION FUNCTIONS
+// =============================================================================
+
 function createSummaryItemRow(productName, quantity, itemTotal) {
   const row = document.createElement('div');
-  row.className = 'flex justify-between text-xs tracking-wide text-gray-400';
+  row.className = 'flex justify-between text-sm';
   row.innerHTML = `
-    <span>${productName} x ${quantity}</span>
+    <span class="text-gray-400">${productName} × ${quantity}</span>
     <span>${formatPrice(itemTotal)}</span>
   `;
   return row;
@@ -341,13 +374,13 @@ function createSummaryItemRow(productName, quantity, itemTotal) {
 
 function createDivider() {
   const divider = document.createElement('div');
-  divider.className = 'border-t border-white/10 my-3';
+  divider.className = 'border-t border-white/10';
   return divider;
 }
 
 function createSummaryRow(label, value, className = '') {
   const row = document.createElement('div');
-  row.className = `flex justify-between text-sm tracking-wide ${className}`;
+  row.className = `flex justify-between text-sm ${className}`;
   row.innerHTML = `
     <span>${label}</span>
     <span>${value}</span>
@@ -355,78 +388,68 @@ function createSummaryRow(label, value, className = '') {
   return row;
 }
 
+// =============================================================================
+// DISCOUNT ROWS CREATION FUNCTIONS
+// =============================================================================
+
 function createDiscountRows(itemDiscounts) {
   const rows = [];
-
-  if (getItemCount() >= DISCOUNT_RATES.BULK_PURCHASE_THRESHOLD) {
-    const bulkRow = document.createElement('div');
-    bulkRow.className =
-      'flex justify-between text-sm tracking-wide text-green-400';
-    bulkRow.innerHTML = `
-      <span class="text-xs">🎉 대량구매 할인 (30개 이상)</span>
-      <span class="text-xs">-${DISCOUNT_RATES.BULK_PURCHASE_DISCOUNT}%</span>
-    `;
-    rows.push(bulkRow);
-  } else if (itemDiscounts.length > 0) {
-    itemDiscounts.forEach((item) => {
-      const discountRow = document.createElement('div');
-      discountRow.className =
-        'flex justify-between text-sm tracking-wide text-green-400';
-      discountRow.innerHTML = `
-        <span class="text-xs">${item.name} (10개↑)</span>
-        <span class="text-xs">-${item.discount}%</span>
-      `;
-      rows.push(discountRow);
-    });
-  }
-
+  itemDiscounts.forEach(({ name, discount }) => {
+    const row = createSummaryRow(
+      `${name} 할인`,
+      `-${discount}%`,
+      'text-green-400'
+    );
+    rows.push(row);
+  });
   return rows;
 }
 
 function createTuesdayDiscountRow() {
   const row = document.createElement('div');
-  row.className = 'flex justify-between text-sm tracking-wide text-purple-400';
+  row.className = 'flex justify-between text-sm text-green-400';
   row.innerHTML = `
-    <span class="text-xs">🌟 화요일 추가 할인</span>
-    <span class="text-xs">-${DISCOUNT_RATES.TUESDAY_DISCOUNT}%</span>
+    <span>🎉 화요일 특별 할인</span>
+    <span>-${DISCOUNT_RATES.TUESDAY_DISCOUNT}%</span>
   `;
   return row;
 }
 
+// =============================================================================
+// DISCOUNT INFO UPDATE FUNCTIONS
+// =============================================================================
+
 export function updateDiscountInfo(discountRate, totalAmount, originalTotal) {
-  const discountInfoDiv = document.getElementById('discount-info');
-  if (!discountInfoDiv) return;
+  const discountInfo = document.getElementById('discount-info');
+  if (!discountInfo) return;
 
-  // 기존 내용 제거
-  discountInfoDiv.innerHTML = '';
+  discountInfo.innerHTML = '';
 
-  if (discountRate <= 0 || totalAmount <= 0) return;
-
-  const savedAmount = originalTotal - totalAmount;
-  const discountElement = createDiscountInfoElement(discountRate, savedAmount);
-  discountInfoDiv.appendChild(discountElement);
+  if (discountRate > 0) {
+    const savedAmount = originalTotal - totalAmount;
+    const discountElement = createDiscountInfoElement(discountRate, savedAmount);
+    discountInfo.appendChild(discountElement);
+  }
 }
 
 function createDiscountInfoElement(discountRate, savedAmount) {
-  const container = document.createElement('div');
-  container.className = 'bg-green-500/20 rounded-lg p-3';
-
-  const headerRow = document.createElement('div');
-  headerRow.className = 'flex justify-between items-center mb-1';
-  headerRow.innerHTML = `
-    <span class="text-xs uppercase tracking-wide text-green-400">총 할인율</span>
-    <span class="text-sm font-medium text-green-400">${(discountRate * 100).toFixed(1)}%</span>
+  const element = document.createElement('div');
+  element.className = 'p-3 bg-green-500/10 border border-green-500/20 rounded-lg';
+  element.innerHTML = `
+    <div class="flex items-center gap-2 mb-1">
+      <span class="text-green-400">🎉</span>
+      <span class="text-sm font-medium text-green-400">할인 적용</span>
+    </div>
+    <div class="text-xs text-green-300">
+      ${(discountRate * 100).toFixed(1)}% 할인으로 ${formatPrice(savedAmount)} 절약
+    </div>
   `;
-
-  const savedAmountText = document.createElement('div');
-  savedAmountText.className = 'text-2xs text-gray-300';
-  savedAmountText.textContent = `${formatPrice(Math.round(savedAmount))} 할인되었습니다`;
-
-  container.appendChild(headerRow);
-  container.appendChild(savedAmountText);
-
-  return container;
+  return element;
 }
+
+// =============================================================================
+// TUESDAY SPECIAL UPDATE FUNCTIONS
+// =============================================================================
 
 export function updateTuesdaySpecialDisplay() {
   const tuesdaySpecial = document.getElementById('tuesday-special');
@@ -439,72 +462,58 @@ export function updateTuesdaySpecialDisplay() {
   }
 }
 
+// =============================================================================
+// LOYALTY POINTS UPDATE FUNCTIONS
+// =============================================================================
+
 export function updateLoyaltyPointsDisplay(points, pointsDetail) {
-  const loyaltyPointsDiv = document.getElementById('loyalty-points');
-  if (!loyaltyPointsDiv) return;
-
-  // 기존 내용 제거
-  loyaltyPointsDiv.innerHTML = '';
-
-  const cartItemsContainer = document.getElementById('cart-items');
-  if (!cartItemsContainer || cartItemsContainer.children.length === 0) {
-    loyaltyPointsDiv.style.display = 'none';
-    return;
-  }
+  const loyaltyPointsElement = document.getElementById('loyalty-points');
+  if (!loyaltyPointsElement) return;
 
   if (points > 0) {
     const pointsElement = createLoyaltyPointsElement(points, pointsDetail);
-    loyaltyPointsDiv.appendChild(pointsElement);
-    loyaltyPointsDiv.style.display = 'block';
+    loyaltyPointsElement.innerHTML = '';
+    loyaltyPointsElement.appendChild(pointsElement);
+    loyaltyPointsElement.style.display = 'block';
   } else {
-    const zeroPointsElement = createZeroPointsElement();
-    loyaltyPointsDiv.appendChild(zeroPointsElement);
-    loyaltyPointsDiv.style.display = 'block';
+    const zeroElement = createZeroPointsElement();
+    loyaltyPointsElement.innerHTML = '';
+    loyaltyPointsElement.appendChild(zeroElement);
+    loyaltyPointsElement.style.display = 'none';
   }
 }
 
 function createLoyaltyPointsElement(points, pointsDetail) {
-  const container = document.createElement('div');
-
-  const pointsText = document.createElement('div');
-  pointsText.innerHTML = `적립 포인트: <span class="font-bold">${points}p</span>`;
-
-  const detailText = document.createElement('div');
-  detailText.className = 'text-2xs opacity-70 mt-1';
-  detailText.textContent = pointsDetail.join(', ');
-
-  container.appendChild(pointsText);
-  container.appendChild(detailText);
-
-  return container;
+  const element = document.createElement('div');
+  element.className = 'text-xs text-blue-400 text-right';
+  
+  let html = `적립 포인트: ${points}p`;
+  if (pointsDetail && pointsDetail.length > 0) {
+    html += `<br><span class="text-blue-300 text-2xs">${pointsDetail.join(', ')}</span>`;
+  }
+  
+  element.innerHTML = html;
+  return element;
 }
 
 function createZeroPointsElement() {
   const element = document.createElement('div');
+  element.className = 'text-xs text-gray-400 text-right';
   element.textContent = '적립 포인트: 0p';
   return element;
 }
 
-// 유틸리티 함수들
+// =============================================================================
+// PRICE DISPLAY HELPER FUNCTIONS
+// =============================================================================
 
 function getPriceDisplay(product) {
-  if (!product.isFlashSale && !product.isRecommended) {
-    return formatPrice(product.price);
+  if (product.isFlashSale || product.isRecommended) {
+    return `${formatPrice(product.originalPrice)} → ${formatPrice(product.price)}`;
   }
-
-  const priceClass =
-    product.isFlashSale && product.isRecommended
-      ? 'text-purple-600'
-      : product.isFlashSale
-        ? 'text-red-500'
-        : 'text-blue-500';
-
-  return `
-    <span class="line-through text-gray-400">${formatPrice(product.originalPrice)}</span>
-    <span class="${priceClass}">${formatPrice(product.price)}</span>
-  `;
+  return formatPrice(product.price);
 }
 
 function formatPrice(price) {
-  return '₩' + price.toLocaleString();
+  return `₩${price.toLocaleString()}`;
 }

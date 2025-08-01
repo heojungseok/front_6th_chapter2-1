@@ -1,5 +1,12 @@
-// Cart state management module
+// =============================================================================
+// CART STATE MANAGEMENT MODULE
+// =============================================================================
+
 import { findProductById } from '../data/productData.js';
+
+// =============================================================================
+// GLOBAL STATE DEFINITION
+// =============================================================================
 
 // 전역 상태 객체
 let globalState = {
@@ -15,6 +22,10 @@ let globalState = {
   lastSelectedProductId: null,
 };
 
+// =============================================================================
+// STATE SUBSCRIPTION SYSTEM
+// =============================================================================
+
 // 상태 변경 구독자들 (React의 리렌더링과 유사)
 const subscribers = new Set();
 
@@ -29,13 +40,20 @@ export function subscribe(callback) {
   return () => subscribers.delete(callback);
 }
 
+// =============================================================================
+// STATE UPDATE FUNCTIONS
+// =============================================================================
+
 // 상태 업데이트 함수 (React의 setState와 유사)
 export function updateState(updates) {
   globalState = { ...globalState, ...updates };
   notifySubscribers();
 }
 
-// Getter 함수들
+// =============================================================================
+// GETTER FUNCTIONS
+// =============================================================================
+
 export function getStockStatusDisplay() {
   return globalState.stockStatusDisplay;
 }
@@ -63,6 +81,10 @@ export function getCartTotalDisplay() {
 export function getLastSelectedProductId() {
   return globalState.lastSelectedProductId;
 }
+
+// =============================================================================
+// SETTER FUNCTIONS
+// =============================================================================
 
 // Setter 함수들 (상태 변경 시 알림)
 export function setStockStatusDisplay(element) {
@@ -93,6 +115,10 @@ export function setLastSelectedProductId(id) {
   updateState({ lastSelectedProductId: id });
 }
 
+// =============================================================================
+// CART CALCULATION FUNCTIONS
+// =============================================================================
+
 // 장바구니 계산 함수들
 export function calculateCartItems(cartItems) {
   const items = [];
@@ -116,6 +142,10 @@ export function calculateCartItems(cartItems) {
 
   return { items, subtotal, totalQuantity };
 }
+
+// =============================================================================
+// CART ITEM OPERATIONS
+// =============================================================================
 
 export function updateExistingCartItem(cartItem, product) {
   const quantityElement = cartItem.querySelector('.quantity-number');
@@ -182,6 +212,10 @@ export function handleRemoveItem(productId) {
 
   cartItem.remove();
 }
+
+// =============================================================================
+// STATE INITIALIZATION & UTILITY
+// =============================================================================
 
 // 상태 초기화 함수
 export function initializeCartState() {

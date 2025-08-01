@@ -1,4 +1,11 @@
-// 타이머 관리 모듈 - 전역 변수 없이 타이머 상태 관리
+// =============================================================================
+// PROMOTION SCHEDULER MODULE
+// =============================================================================
+
+// =============================================================================
+// CONFIGURATION CONSTANTS
+// =============================================================================
+
 const TIMING_CONFIG = {
   LIGHTNING_SALE_INTERVAL: 30000,
   LIGHTNING_SALE_DELAY: 10000,
@@ -11,9 +18,17 @@ const DISCOUNT_RATES = {
   RECOMMENDATION_DISCOUNT: 5,
 };
 
+// =============================================================================
+// TIMER STATE MANAGEMENT
+// =============================================================================
+
 // 모듈 내부에서만 접근 가능한 타이머 ID들
 let lightningSaleTimer = null;
 let recommendationTimer = null;
+
+// =============================================================================
+// LIGHTNING SALE TIMER FUNCTIONS
+// =============================================================================
 
 // 타이머 시작 함수들
 function startLightningSaleTimer(
@@ -58,6 +73,10 @@ function startLightningSaleTimer(
     }, TIMING_CONFIG.LIGHTNING_SALE_INTERVAL);
   }, lightningDelay);
 }
+
+// =============================================================================
+// RECOMMENDATION TIMER FUNCTIONS
+// =============================================================================
 
 function startRecommendationTimer(
   productList,
@@ -108,7 +127,10 @@ function startRecommendationTimer(
   }, recommendationDelay);
 }
 
-// 타이머 정리 함수
+// =============================================================================
+// TIMER CLEANUP FUNCTIONS
+// =============================================================================
+
 function stopAllTimers() {
   if (lightningSaleTimer) {
     clearInterval(lightningSaleTimer);
@@ -120,5 +142,8 @@ function stopAllTimers() {
   }
 }
 
-// 모듈 외부로 노출할 함수들
+// =============================================================================
+// MODULE EXPORTS
+// =============================================================================
+
 export { startLightningSaleTimer, startRecommendationTimer, stopAllTimers };

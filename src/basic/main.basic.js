@@ -1,3 +1,7 @@
+// =============================================================================
+// MODULE IMPORTS
+// =============================================================================
+
 // 타이머 관리 모듈 import
 import {
   startLightningSaleTimer,
@@ -68,6 +72,10 @@ import {
   DISCOUNT_PERCENTAGES 
 } from './constants/discount.js';
 
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
+
 // 중복 코드 제거를 위한 헬퍼 함수들
 function getRequiredElement(
   getterFunction,
@@ -90,6 +98,10 @@ function getRequiredProduct(productId, errorMessage = ERROR_MESSAGES.PRODUCT_NOT
   return product;
 }
 
+// =============================================================================
+// DISCOUNT & STYLING UTILITIES
+// =============================================================================
+
 function getDiscountIcon(product) {
   return `${product.isFlashSale ? DISCOUNT_ICONS.FLASH_SALE : ''}${product.isRecommended ? DISCOUNT_ICONS.RECOMMENDATION : ''}`;
 }
@@ -108,6 +120,10 @@ function getDiscountClassName(product) {
 function formatPrice(price) {
   return CURRENCY_SYMBOL + price.toLocaleString();
 }
+
+// =============================================================================
+// PRODUCT SELECTOR FUNCTIONS
+// =============================================================================
 
 function createProductOption(product) {
   const option = document.createElement('option');
@@ -173,6 +189,10 @@ function updateSelectOptions() {
   return totalStock;
 }
 
+// =============================================================================
+// CART DISPLAY UPDATE FUNCTIONS
+// =============================================================================
+
 function updatePricesInCart() {
   const cartItemsContainer = getRequiredElement(
     getCartItemsContainer,
@@ -235,7 +255,10 @@ function updatePriceDisplay(priceDiv, product) {
   priceDiv.appendChild(currentPriceSpan);
 }
 
-// 이벤트 핸들러 함수들
+// =============================================================================
+// EVENT HANDLERS
+// =============================================================================
+
 function insertProductToCart() {
   const productSelectElement = getRequiredElement(
     getProductSelectElement,
@@ -314,10 +337,29 @@ function handleCartItemClick(event) {
   updateSelectOptions();
 }
 
+// =============================================================================
+// TIMER MANAGEMENT
+// =============================================================================
+
 // 타이머 정리 함수 (모듈 함수 래핑)
 function cleanupTimers() {
   stopAllTimers();
 }
+
+// 타이머 관련 로직 분리
+function startPromotionalTimers() {
+  startLightningSaleTimer(productList, updateSelectOptions, updatePricesInCart);
+  startRecommendationTimer(
+    productList,
+    getLastSelectedProductId,
+    updateSelectOptions,
+    updatePricesInCart
+  );
+}
+
+// =============================================================================
+// APP INITIALIZATION
+// =============================================================================
 
 // 초기화 함수
 function initializeApp() {
@@ -353,6 +395,22 @@ function initializeApp() {
   updateSelectOptions();
   updateCartCalculations();
 }
+
+// 이벤트 리스너 등록 로직 분리
+function setupEventListeners() {
+  // 장바구니 아이템 이벤트 위임
+  getCartItemsContainer().addEventListener('click', handleCartItemClick);
+  
+  // 상품 추가 버튼
+  const addToCartBtn = document.getElementById('add-to-cart');
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', insertProductToCart);
+  }
+}
+
+// =============================================================================
+// CART CALCULATION LOGIC
+// =============================================================================
 
 // 계산 로직 분리 - 순수 함수로 작성
 function calculateCartSummary(cartItems) {
@@ -442,6 +500,10 @@ function updateCartCalculations() {
   updateStockInfo();
 }
 
+// =============================================================================
+// MAIN APPLICATION LOGIC
+// =============================================================================
+
 // 최종 main 함수
 function main() {
   // 기존 타이머 정리
@@ -454,33 +516,14 @@ function main() {
   startPromotionalTimers();
 }
 
-// 이벤트 리스너 등록 로직 분리
-function setupEventListeners() {
-  // 장바구니 아이템 이벤트 위임
-  getCartItemsContainer().addEventListener('click', handleCartItemClick);
-  
-  // 상품 추가 버튼
-  const addToCartBtn = document.getElementById('add-to-cart');
-  if (addToCartBtn) {
-    addToCartBtn.addEventListener('click', insertProductToCart);
-  }
-}
-
-// 타이머 관련 로직 분리
-function startPromotionalTimers() {
-  startLightningSaleTimer(productList, updateSelectOptions, updatePricesInCart);
-  startRecommendationTimer(
-    productList,
-    getLastSelectedProductId,
-    updateSelectOptions,
-    updatePricesInCart
-  );
-}
-
 // 앱 정리 함수
 function cleanupApp() {
   cleanupTimers();
 }
+
+// =============================================================================
+// EVENT LISTENERS & APP STARTUP
+// =============================================================================
 
 // 페이지 언로드 시 정리
 window.addEventListener('beforeunload', cleanupApp);
