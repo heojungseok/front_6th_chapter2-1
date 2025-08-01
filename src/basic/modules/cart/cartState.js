@@ -148,31 +148,30 @@ export function calculateCartItems(cartItems) {
 // =============================================================================
 
 export function updateExistingCartItem(cartItem, product) {
-  const quantityElement = cartItem.querySelector('.quantity-number');
-  const currentQuantity = parseInt(quantityElement.textContent);
+  const currentQuantity = getCurrentQuantity(cartItem);
   const newQuantity = currentQuantity + 1;
 
-  // 재고가 있는 경우에만 수량 증가
-  if (product.stockQuantity > 0) {
-    quantityElement.textContent = newQuantity;
-    product.stockQuantity--;
-  } else {
-    // 재고 부족 시 알림
-    if (typeof window !== 'undefined' && window.alert) {
-      window.alert('재고가 부족합니다.');
-    }
+  if (!isStockAvailable(product)) {
+    showStockShortageAlert();
+    return;
   }
+
+  updateItemQuantity(cartItem, newQuantity, product, 1);
+}
+
+// 재고 사용 가능 여부 확인
+function isStockAvailable(product) {
+  return product.stockQuantity > 0;
 }
 
 export function handleQuantityChange(productId, changeAmount) {
-  const cartItem = document.getElementById(productId);
+  const cartItem = getCartItemById(productId);
   if (!cartItem) return;
 
   const product = findProductById(productId);
   if (!product) return;
 
-  const quantityElement = cartItem.querySelector('.quantity-number');
-  const currentQuantity = parseInt(quantityElement.textContent);
+  const currentQuantity = getCurrentQuantity(cartItem);
   const newQuantity = currentQuantity + changeAmount;
 
   if (newQuantity <= 0) {
@@ -180,36 +179,66 @@ export function handleQuantityChange(productId, changeAmount) {
     return;
   }
 
-  // 재고 제한 확인 - 현재 장바구니 수량 + 재고를 초과할 수 없음
-  if (
-    changeAmount > 0 &&
-    newQuantity > currentQuantity + product.stockQuantity
-  ) {
-    // 재고 부족 시 알림
-    if (typeof window !== 'undefined' && window.alert) {
-      window.alert('재고가 부족합니다.');
-    }
+  if (!isQuantityChangeValid(changeAmount, currentQuantity, product)) {
+    showStockShortageAlert();
     return;
   }
 
-  // 수량 변경 가능한 경우에만 처리
-  if (newQuantity <= currentQuantity + product.stockQuantity) {
-    quantityElement.textContent = newQuantity;
-    product.stockQuantity -= changeAmount;
+  updateItemQuantity(cartItem, newQuantity, product, changeAmount);
+}
+
+// 장바구니 아이템 조회
+function getCartItemById(productId) {
+  return document.getElementById(productId);
+}
+
+// 현재 수량 조회
+function getCurrentQuantity(cartItem) {
+  const quantityElement = cartItem.querySelector('.quantity-number');
+  return parseInt(quantityElement.textContent);
+}
+
+// 수량 변경 유효성 검사
+function isQuantityChangeValid(changeAmount, currentQuantity, product) {
+  if (changeAmount <= 0) return true;
+  
+  const newQuantity = currentQuantity + changeAmount;
+  return newQuantity <= currentQuantity + product.stockQuantity;
+}
+
+// 재고 부족 알림
+function showStockShortageAlert() {
+  if (typeof window !== 'undefined' && window.alert) {
+    window.alert('재고가 부족합니다.');
   }
 }
 
+// 아이템 수량 업데이트
+function updateItemQuantity(cartItem, newQuantity, product, changeAmount) {
+  const quantityElement = cartItem.querySelector('.quantity-number');
+  quantityElement.textContent = newQuantity;
+  product.stockQuantity -= changeAmount;
+}
+
 export function handleRemoveItem(productId) {
-  const cartItem = document.getElementById(productId);
+  const cartItem = getCartItemById(productId);
   if (!cartItem) return;
 
   const product = findProductById(productId);
   if (!product) return;
 
-  const quantityElement = cartItem.querySelector('.quantity-number');
-  const quantity = parseInt(quantityElement.textContent);
-  product.stockQuantity += quantity;
+  const quantity = getCurrentQuantity(cartItem);
+  restoreProductStock(product, quantity);
+  removeCartItem(cartItem);
+}
 
+// 상품 재고 복원
+function restoreProductStock(product, quantity) {
+  product.stockQuantity += quantity;
+}
+
+// 장바구니 아이템 제거
+function removeCartItem(cartItem) {
   cartItem.remove();
 }
 

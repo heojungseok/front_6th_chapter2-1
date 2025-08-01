@@ -19,16 +19,10 @@ export function calculateLoyaltyPoints(totalAmount, totalQuantity, cartItems) {
   }
 
   // 상품 조합 보너스 로직을 별도 함수로 분리하여 가독성과 재사용성을 높임
-  function getProductCombinationBonuses(cartItems) {
-    const hasKeyboard = cartItems.some(
-      (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_ONE
-    );
-    const hasMouse = cartItems.some(
-      (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_TWO
-    );
-    const hasMonitorArm = cartItems.some(
-      (item) => item.id === PRODUCT_CONSTANTS.PRODUCT_THREE
-    );
+  function getProductCombinationBonuses(productIds) {
+    const hasKeyboard = productIds.includes(PRODUCT_CONSTANTS.PRODUCT_ONE);
+    const hasMouse = productIds.includes(PRODUCT_CONSTANTS.PRODUCT_TWO);
+    const hasMonitorArm = productIds.includes(PRODUCT_CONSTANTS.PRODUCT_THREE);
 
     const bonuses = [];
     let bonusPoints = 0;
